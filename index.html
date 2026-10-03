@@ -1,0 +1,4636 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>نظام التشخيص الذكي</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0,0" rel="stylesheet">
+
+<style>
+*{
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+    margin:0;
+    padding:0;
+    width:100%;
+    min-height:100%;
+    font-family:"Cairo",sans-serif;
+}
+
+body{
+    background:#070b14;
+    color:#f8fafc;
+    transition:.3s;
+}
+
+body.light{
+    background:#f1f5f9;
+    color:#0f172a;
+}
+
+.material-symbols-outlined{
+    font-size:22px;
+    vertical-align:middle;
+}
+
+button,
+input,
+select,
+textarea{
+    font-family:inherit;
+}
+
+button{
+    cursor:pointer;
+}
+
+.app{
+    min-height:100vh;
+    padding-bottom:40px;
+}
+
+.container{
+    width:min(1180px,calc(100% - 28px));
+    margin:auto;
+}
+
+.glass{
+    background:rgba(15,23,42,.72);
+    border:1px solid rgba(148,163,184,.14);
+    box-shadow:
+        0 20px 60px rgba(0,0,0,.25),
+        inset 0 1px rgba(255,255,255,.03);
+    backdrop-filter:blur(20px);
+}
+
+.light .glass{
+    background:rgba(255,255,255,.84);
+    border-color:rgba(15,23,42,.08);
+    box-shadow:0 15px 40px rgba(15,23,42,.08);
+}
+
+header{
+    position:sticky;
+    top:0;
+    z-index:50;
+    background:rgba(7,11,20,.82);
+    backdrop-filter:blur(20px);
+    border-bottom:1px solid rgba(148,163,184,.1);
+}
+
+.light header{
+    background:rgba(248,250,252,.88);
+}
+
+.header-inner{
+    min-height:76px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:15px;
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.brand-icon{
+    width:46px;
+    height:46px;
+    border-radius:15px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:linear-gradient(135deg,#2563eb,#7c3aed);
+    box-shadow:0 10px 30px rgba(37,99,235,.28);
+}
+
+.brand-title{
+    font-size:18px;
+    font-weight:800;
+    line-height:1.2;
+}
+
+.brand-subtitle{
+    color:#94a3b8;
+    font-size:11px;
+    margin-top:2px;
+}
+
+.light .brand-subtitle{
+    color:#64748b;
+}
+
+.header-actions{
+    display:flex;
+    gap:8px;
+}
+
+.icon-btn{
+    width:42px;
+    height:42px;
+    border:1px solid rgba(148,163,184,.13);
+    border-radius:13px;
+    background:rgba(30,41,59,.7);
+    color:#e2e8f0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:.2s;
+}
+
+.icon-btn:hover{
+    transform:translateY(-1px);
+    background:#1e293b;
+}
+
+.light .icon-btn{
+    background:#fff;
+    color:#334155;
+    border-color:#e2e8f0;
+}
+
+main{
+    padding-top:24px;
+}
+
+.hero{
+    text-align:center;
+    padding:18px 10px 24px;
+}
+
+.hero h1{
+    font-size:clamp(25px,5vw,38px);
+    font-weight:800;
+    margin:0;
+}
+
+.hero p{
+    color:#94a3b8;
+    margin:8px auto 0;
+    max-width:650px;
+    line-height:1.8;
+}
+
+.light .hero p{
+    color:#64748b;
+}
+
+/* Scan card */
+
+.scan-card{
+    border-radius:28px;
+    padding:18px;
+    overflow:hidden;
+}
+
+.section-title{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:15px;
+}
+
+.section-title h2{
+    margin:0;
+    font-size:17px;
+    font-weight:800;
+}
+
+.section-title span{
+    color:#64748b;
+    font-size:12px;
+}
+
+.camera-box{
+    position:relative;
+    width:100%;
+    min-height:330px;
+    max-height:580px;
+    aspect-ratio:16/10;
+    border-radius:22px;
+    overflow:hidden;
+    background:
+        radial-gradient(circle at center,#172554 0,#0f172a 38%,#020617 100%);
+    border:1px solid rgba(148,163,184,.13);
+}
+
+.light .camera-box{
+    background:
+        radial-gradient(circle at center,#dbeafe 0,#e2e8f0 42%,#cbd5e1 100%);
+}
+
+#video,
+#capturedImage{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+#capturedImage{
+    display:none;
+    z-index:2;
+    pointer-events:none;
+}
+
+.camera-placeholder{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    gap:10px;
+    color:#94a3b8;
+    pointer-events:auto;
+    z-index:8;
+}
+
+.camera-placeholder .material-symbols-outlined{
+    font-size:58px;
+    opacity:.6;
+}
+
+.scanner-line{
+    position:absolute;
+    left:7%;
+    right:7%;
+    height:2px;
+    background:linear-gradient(
+        90deg,
+        transparent,
+        #38bdf8,
+        #818cf8,
+        transparent
+    );
+    box-shadow:0 0 20px #38bdf8;
+    top:20%;
+    display:none;
+    animation:scan 2.3s infinite;
+    z-index:5;
+}
+
+@keyframes scan{
+    0%{top:18%}
+    50%{top:78%}
+    100%{top:18%}
+}
+
+.camera-active .scanner-line{
+    display:block;
+}
+
+.camera-corners{
+    position:absolute;
+    inset:20px;
+    pointer-events:none;
+    display:none;
+}
+
+.camera-active .camera-corners{
+    display:block;
+}
+
+.corner{
+    position:absolute;
+    width:32px;
+    height:32px;
+    border-color:#38bdf8;
+}
+
+.corner.tl{
+    top:0;
+    left:0;
+    border-top:3px solid;
+    border-left:3px solid;
+}
+
+.corner.tr{
+    top:0;
+    right:0;
+    border-top:3px solid;
+    border-right:3px solid;
+}
+
+.corner.bl{
+    bottom:0;
+    left:0;
+    border-bottom:3px solid;
+    border-left:3px solid;
+}
+
+.corner.br{
+    bottom:0;
+    right:0;
+    border-bottom:3px solid;
+    border-right:3px solid;
+}
+
+.loading{
+    position:absolute;
+    inset:0;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    gap:15px;
+    background:rgba(2,6,23,.75);
+    backdrop-filter:blur(8px);
+    z-index:20;
+}
+
+.loading.active{
+    display:flex;
+}
+
+.loader{
+    width:48px;
+    height:48px;
+    border:4px solid rgba(255,255,255,.12);
+    border-top-color:#38bdf8;
+    border-radius:50%;
+    animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+    to{transform:rotate(360deg)}
+}
+
+.controls{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+    margin-top:13px;
+}
+
+.btn{
+    min-height:48px;
+    border:0;
+    border-radius:14px;
+    padding:10px 14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    font-size:13px;
+    font-weight:700;
+    transition:.2s;
+}
+
+.btn:hover{
+    transform:translateY(-1px);
+}
+
+.btn-primary{
+    background:linear-gradient(135deg,#2563eb,#4f46e5);
+    color:white;
+    box-shadow:0 10px 25px rgba(37,99,235,.22);
+}
+
+.btn-secondary{
+    background:#1e293b;
+    color:#e2e8f0;
+    border:1px solid rgba(148,163,184,.12);
+}
+
+.light .btn-secondary{
+    background:#fff;
+    color:#334155;
+    border-color:#e2e8f0;
+}
+
+.btn-danger{
+    background:#991b1b;
+    color:white;
+}
+
+.btn-success{
+    background:linear-gradient(135deg,#059669,#0f766e);
+    color:white;
+}
+
+.btn:disabled{
+    opacity:.45;
+    cursor:not-allowed;
+    transform:none;
+}
+
+.mode-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-top:14px;
+}
+
+.mode{
+    padding:13px;
+    border-radius:15px;
+    border:1px solid rgba(148,163,184,.13);
+    background:rgba(30,41,59,.42);
+    cursor:pointer;
+}
+
+.light .mode{
+    background:#f8fafc;
+}
+
+.mode.active{
+    border-color:#3b82f6;
+    background:rgba(37,99,235,.12);
+}
+
+.mode-title{
+    font-size:13px;
+    font-weight:800;
+}
+
+.mode-description{
+    font-size:11px;
+    color:#94a3b8;
+    margin-top:3px;
+}
+
+/* Advanced fields */
+
+.advanced-panel{
+    display:none;
+    margin-top:14px;
+    padding:15px;
+    border-radius:18px;
+    background:rgba(15,23,42,.42);
+    border:1px solid rgba(148,163,184,.1);
+}
+
+.light .advanced-panel{
+    background:#f8fafc;
+}
+
+.advanced-panel.active{
+    display:block;
+}
+
+.fields{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:11px;
+}
+
+.field{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+}
+
+.field.full{
+    grid-column:1/-1;
+}
+
+.field label{
+    font-size:11px;
+    color:#94a3b8;
+    font-weight:700;
+}
+
+.field input,
+.field select,
+.field textarea{
+    width:100%;
+    border:1px solid rgba(148,163,184,.14);
+    background:#0f172a;
+    color:#f8fafc;
+    border-radius:12px;
+    padding:11px 12px;
+    outline:none;
+}
+
+.field textarea{
+    min-height:82px;
+    resize:vertical;
+}
+
+.light .field input,
+.light .field select,
+.light .field textarea{
+    background:#fff;
+    color:#0f172a;
+    border-color:#e2e8f0;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus{
+    border-color:#3b82f6;
+    box-shadow:0 0 0 3px rgba(59,130,246,.1);
+}
+
+/* Images inside the Start Diagnosis camera box */
+.camera-image-grid{position:absolute;left:10px;right:10px;bottom:10px;height:82px;z-index:9;display:none;grid-template-columns:none;grid-auto-rows:none;grid-auto-flow:column;grid-auto-columns:72px;gap:8px;padding:6px;border-radius:16px;background:rgba(2,6,23,.58);backdrop-filter:blur(7px);overflow-x:auto;overflow-y:hidden;}
+.camera-image-grid.active{display:grid;}
+.camera-image-preview{position:relative;width:72px;height:70px;min-width:72px;min-height:70px;overflow:hidden;border-radius:12px;border:2px solid rgba(255,255,255,.16);background:#0f172a;box-shadow:0 8px 20px rgba(0,0,0,.2);cursor:pointer;transition:.18s ease;}
+.camera-image-preview:hover{transform:scale(1.03);}
+.camera-image-preview.active{border-color:#38bdf8;box-shadow:0 0 0 2px rgba(56,189,248,.28),0 10px 24px rgba(0,0,0,.3);}
+.camera-image-preview img{width:100%;height:100%;object-fit:cover;display:block;}
+.camera-image-preview.single{grid-column:auto;}
+.camera-image-preview .preview-number{position:absolute;top:4px;right:4px;min-width:20px;height:20px;padding:0 5px;border-radius:7px;display:grid;place-items:center;background:rgba(2,6,23,.76);color:#fff;font-size:9px;font-weight:900;backdrop-filter:blur(8px);}
+
+
+.selected-images-area{
+    display:none;
+    margin-top:12px;
+    padding:10px;
+    border-radius:18px;
+    background:rgba(15,23,42,.5);
+    border:1px solid rgba(148,163,184,.14);
+}
+.selected-images-area.active{display:block;}
+.light .selected-images-area{background:#f8fafc;border-color:#e2e8f0;}
+.selected-images-main{
+    position:relative;
+    width:100%;
+    min-height:180px;
+    max-height:360px;
+    border-radius:14px;
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    gap:8px;
+    color:#94a3b8;
+    background:#020617;
+}
+.light .selected-images-main{background:#e2e8f0;color:#64748b;}
+.selected-images-main img{width:100%;height:100%;min-height:180px;max-height:360px;object-fit:contain;display:block;}
+.selected-images-thumbs{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-top:8px;}
+.selected-image-thumb{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;border:2px solid transparent;cursor:pointer;background:#0f172a;}
+.selected-image-thumb.active{border-color:#38bdf8;}
+.selected-image-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.selected-image-number{position:absolute;right:3px;top:3px;min-width:18px;height:18px;border-radius:6px;background:rgba(0,0,0,.7);color:#fff;font-size:9px;display:grid;place-items:center;}
+@media(max-width:560px){.selected-images-main{min-height:150px;max-height:280px}.selected-images-main img{min-height:150px;max-height:280px}.selected-images-thumbs{grid-template-columns:repeat(5,1fr);gap:5px}}
+
+/* Images */
+
+.image-list{
+    display:none;
+    grid-template-columns:repeat(5,1fr);
+    gap:8px;
+    margin-top:12px;
+}
+
+.image-list.active{
+    display:grid;
+}
+
+.image-thumb{
+    position:relative;
+    aspect-ratio:1;
+    border-radius:12px;
+    overflow:hidden;
+    border:2px solid transparent;
+    background:#0f172a;
+}
+
+.image-thumb.active{
+    border-color:#3b82f6;
+}
+
+.image-thumb img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.thumb-number{
+    position:absolute;
+    top:4px;
+    right:4px;
+    min-width:20px;
+    height:20px;
+    border-radius:7px;
+    background:rgba(0,0,0,.65);
+    color:white;
+    font-size:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+/* Report */
+
+.report-section{
+    display:none;
+    margin-top:22px;
+}
+
+.report-section.active{
+    display:block;
+}
+
+.report-card{
+    border-radius:28px;
+    padding:18px;
+}
+
+.report-header{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    padding-bottom:15px;
+    border-bottom:1px solid rgba(148,163,184,.1);
+}
+
+.report-header h2{
+    margin:0;
+    font-size:20px;
+    font-weight:800;
+}
+
+.report-header p{
+    margin:4px 0 0;
+    color:#94a3b8;
+    font-size:11px;
+}
+
+.severity{
+    padding:7px 11px;
+    border-radius:10px;
+    font-size:11px;
+    font-weight:800;
+    white-space:nowrap;
+}
+
+.severity.high{
+    background:rgba(239,68,68,.13);
+    color:#f87171;
+}
+
+.severity.medium{
+    background:rgba(245,158,11,.13);
+    color:#fbbf24;
+}
+
+.severity.low{
+    background:rgba(34,197,94,.13);
+    color:#4ade80;
+}
+
+.report-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:11px;
+    margin-top:15px;
+}
+
+.info-box{
+    padding:14px;
+    border-radius:16px;
+    background:rgba(15,23,42,.48);
+    border:1px solid rgba(148,163,184,.08);
+}
+
+.light .info-box{
+    background:#f8fafc;
+}
+
+.info-label{
+    color:#94a3b8;
+    font-size:10px;
+    font-weight:700;
+}
+
+.info-value{
+    margin-top:5px;
+    font-size:13px;
+    font-weight:800;
+    line-height:1.6;
+}
+
+.confidence-wrap{
+    margin-top:15px;
+}
+
+.confidence-top{
+    display:flex;
+    justify-content:space-between;
+    font-size:11px;
+    color:#94a3b8;
+}
+
+.progress{
+    height:8px;
+    background:#1e293b;
+    border-radius:99px;
+    overflow:hidden;
+    margin-top:7px;
+}
+
+.light .progress{
+    background:#e2e8f0;
+}
+
+.progress span{
+    display:block;
+    height:100%;
+    width:0;
+    border-radius:inherit;
+    background:linear-gradient(90deg,#06b6d4,#3b82f6,#8b5cf6);
+    transition:1s;
+}
+
+.report-block{
+    margin-top:15px;
+}
+
+.report-block h3{
+    font-size:14px;
+    margin:0 0 9px;
+    font-weight:800;
+}
+
+.reason-list,
+.steps{
+    margin:0;
+    padding:0;
+    list-style:none;
+    display:grid;
+    gap:8px;
+}
+
+.reason-list li,
+.steps li{
+    padding:11px 12px;
+    border-radius:13px;
+    background:rgba(30,41,59,.42);
+    font-size:12px;
+    line-height:1.7;
+}
+
+.light .reason-list li,
+.light .steps li{
+    background:#f8fafc;
+}
+
+.part-box{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:9px;
+}
+
+.report-actions{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:9px;
+    margin-top:17px;
+}
+
+/* Recent */
+
+.recent-section{
+    margin-top:22px;
+}
+
+.recent-card{
+    border-radius:28px;
+    padding:18px;
+}
+
+.recent-list{
+    display:grid;
+    gap:9px;
+}
+
+.recent-empty{
+    padding:28px 15px;
+    text-align:center;
+    color:#64748b;
+    border:1px dashed rgba(148,163,184,.18);
+    border-radius:17px;
+}
+
+.recent-item{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:13px;
+    border-radius:16px;
+    background:rgba(15,23,42,.45);
+    border:1px solid rgba(148,163,184,.08);
+}
+
+.light .recent-item{
+    background:#f8fafc;
+}
+
+.trash-list{
+    display:grid;
+    gap:9px;
+}
+
+.trash-item{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:13px;
+    border-radius:16px;
+    background:rgba(15,23,42,.45);
+    border:1px solid rgba(148,163,184,.08);
+}
+
+.light .trash-item{
+    background:#f8fafc;
+}
+
+.trash-info{
+    min-width:0;
+}
+
+.trash-issue{
+    font-size:13px;
+    font-weight:800;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.trash-meta{
+    font-size:10px;
+    color:#64748b;
+    margin-top:3px;
+}
+
+.trash-buttons{
+    display:flex;
+    gap:6px;
+    flex-shrink:0;
+}
+
+
+.recent-info{
+    min-width:0;
+}
+
+.recent-issue{
+    font-size:13px;
+    font-weight:800;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.recent-meta{
+    font-size:10px;
+    color:#64748b;
+    margin-top:3px;
+}
+
+.recent-buttons{
+    display:flex;
+    gap:6px;
+    flex-shrink:0;
+}
+
+.small-btn{
+    width:38px;
+    height:38px;
+    border:0;
+    border-radius:11px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#1e293b;
+    color:#e2e8f0;
+}
+
+.light .small-btn{
+    background:white;
+    color:#334155;
+    border:1px solid #e2e8f0;
+}
+
+.small-btn.delete{
+    color:#f87171;
+}
+
+/* Footer */
+
+footer{
+    text-align:center;
+    color:#64748b;
+    font-size:10px;
+    padding:25px 10px 5px;
+}
+
+/* Modern universal modal */
+.modal{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:15px;background:rgba(2,6,23,.72);backdrop-filter:blur(18px) saturate(135%);-webkit-backdrop-filter:blur(18px) saturate(135%);}
+.modal.active{display:flex;animation:modalFadeIn .18s ease-out;}
+.modal-card{width:min(560px,100%);max-height:90vh;overflow:auto;border-radius:28px;padding:20px;background:linear-gradient(145deg,rgba(15,23,42,.97),rgba(9,15,29,.95));border:1px solid rgba(148,163,184,.18);box-shadow:0 35px 100px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.045);animation:modalCardIn .22s cubic-bezier(.2,.8,.2,1);}
+.light .modal-card{background:linear-gradient(145deg,rgba(255,255,255,.99),rgba(241,245,249,.98));border-color:#e2e8f0;box-shadow:0 30px 80px rgba(15,23,42,.2),inset 0 1px 0 rgba(255,255,255,.9);}
+.modal-header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:15px;}
+.modal-header h2{margin:0;font-size:20px;font-weight:950;}
+.close-btn{width:40px;height:40px;border:1px solid rgba(148,163,184,.14);border-radius:13px;background:rgba(30,41,59,.75);color:white;font-size:25px;line-height:1;cursor:pointer;transition:.18s ease;}
+.close-btn:hover{transform:translateY(-1px) scale(1.02);background:rgba(51,65,85,.9);}
+.light .close-btn{background:#f1f5f9;color:#0f172a;border-color:#e2e8f0;}
+@keyframes modalFadeIn{from{opacity:0}to{opacity:1}}
+@keyframes modalCardIn{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+/* Universal modern selection dialog */
+.modern-choice-modal{position:fixed;inset:0;z-index:1200;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(2,6,23,.76);backdrop-filter:blur(20px) saturate(140%);-webkit-backdrop-filter:blur(20px) saturate(140%);}
+.modern-choice-modal.active{display:flex;animation:modalFadeIn .18s ease-out;}
+.modern-choice-card{width:min(500px,94vw);max-height:min(78vh,620px);overflow:auto;border-radius:28px;padding:10px;background:linear-gradient(145deg,rgba(22,32,51,.98),rgba(9,15,29,.98));border:1px solid rgba(96,165,250,.22);box-shadow:0 35px 100px rgba(0,0,0,.6),0 0 50px rgba(37,99,235,.08),inset 0 1px 0 rgba(255,255,255,.05);animation:modalCardIn .22s cubic-bezier(.2,.8,.2,1);}
+.light .modern-choice-card{background:linear-gradient(145deg,#fff,#f1f5f9);border-color:#dbeafe;box-shadow:0 30px 80px rgba(15,23,42,.2),inset 0 1px 0 rgba(255,255,255,.9);}
+.modern-choice-header{display:flex;align-items:center;gap:12px;padding:12px 12px 14px;}
+.modern-choice-icon{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#2563eb,#4f46e5);box-shadow:0 10px 26px rgba(37,99,235,.25);flex:0 0 auto;}
+.modern-choice-title{font-size:18px;font-weight:950;line-height:1.3;}
+.modern-choice-subtitle{font-size:11px;color:#94a3b8;margin-top:3px;font-weight:700;}
+.modern-choice-close{margin-inline-start:auto;width:40px;height:40px;border:0;border-radius:13px;background:rgba(51,65,85,.7);color:#fff;font-size:24px;cursor:pointer;}
+.light .modern-choice-close{background:#e2e8f0;color:#0f172a;}
+.modern-choice-options{display:grid;gap:6px;}
+.modern-choice-option{width:100%;min-height:62px;border:1px solid transparent;border-radius:18px;background:rgba(30,41,59,.52);color:#f8fafc;display:flex;align-items:center;gap:12px;padding:10px 14px;text-align:inherit;cursor:pointer;font:inherit;transition:.18s ease;}
+.modern-choice-option:hover{transform:translateY(-1px);background:linear-gradient(135deg,rgba(37,99,235,.22),rgba(79,70,229,.16));border-color:rgba(96,165,250,.3);}
+.modern-choice-option.selected{background:linear-gradient(135deg,rgba(37,99,235,.28),rgba(79,70,229,.2));border-color:rgba(96,165,250,.48);}
+.light .modern-choice-option{background:#f8fafc;color:#0f172a;border-color:#e2e8f0;}
+.light .modern-choice-option:hover,.light .modern-choice-option.selected{background:linear-gradient(135deg,#eff6ff,#eef2ff);border-color:#bfdbfe;}
+.modern-choice-option-icon{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:rgba(59,130,246,.12);color:#60a5fa;flex:0 0 auto;}
+.light .modern-choice-option-icon{background:#dbeafe;color:#2563eb;}
+.modern-choice-option-text{font-size:15px;font-weight:850;flex:1;}
+.modern-choice-radio{width:22px;height:22px;border-radius:50%;border:2px solid #64748b;position:relative;flex:0 0 auto;}
+.modern-choice-option.selected .modern-choice-radio{border-color:#38bdf8;box-shadow:0 0 0 4px rgba(56,189,248,.08);}
+.modern-choice-option.selected .modern-choice-radio:after{content:"";position:absolute;inset:4px;border-radius:50%;background:#38bdf8;box-shadow:0 0 10px rgba(56,189,248,.55);}
+.modern-choice-footer{padding:10px 12px 4px;color:#64748b;font-size:10px;text-align:center;}
+.modern-select-trigger{width:100%;min-height:46px;padding:0 13px;border-radius:14px;border:1px solid rgba(96,165,250,.28);background:linear-gradient(135deg,rgba(37,99,235,.16),rgba(79,70,229,.12));color:#f8fafc;font:inherit;font-weight:850;display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.1);}
+.modern-select-trigger .material-symbols-outlined{font-size:20px;color:#60a5fa;}
+.light .modern-select-trigger{background:linear-gradient(135deg,#eff6ff,#eef2ff);color:#1e293b;border-color:#bfdbfe;}
+.select-setting{display:none!important;}
+.modern-native-hidden{display:none!important;}
+/* FIX: native selects are hidden while the modern touch-friendly trigger is shown */
+select.modern-native-hidden{
+    display:none!important;
+    visibility:hidden!important;
+    position:absolute!important;
+    width:1px!important;
+    height:1px!important;
+    opacity:0!important;
+    pointer-events:none!important;
+}
+.modern-select-trigger{
+    width:100%;
+    min-height:48px;
+    border:1px solid rgba(96,165,250,.28);
+    border-radius:15px;
+    padding:10px 13px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    background:linear-gradient(135deg,rgba(37,99,235,.18),rgba(79,70,229,.12));
+    color:#f8fafc;
+    font:inherit;
+    font-size:14px;
+    font-weight:900;
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+    touch-action:manipulation;
+}
+.light .modern-select-trigger{
+    color:#1e293b;
+    background:linear-gradient(135deg,#eff6ff,#eef2ff);
+    border-color:#bfdbfe;
+}
+.modern-select-trigger:active{transform:scale(.985);}
+.modern-select-value{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+@media(max-width:560px){
+    .settings-modern .modern-select-trigger{grid-column:2;min-height:48px;width:100%;}
+}
+
+
+/* Settings */
+
+.setting-item{
+    padding:14px 0;
+    border-bottom:1px solid rgba(148,163,184,.1);
+}
+
+.setting-item:last-child{
+    border-bottom:0;
+}
+
+.setting-label{
+    font-size:13px;
+    font-weight:800;
+}
+
+.setting-description{
+    font-size:10px;
+    color:#64748b;
+    margin-top:4px;
+}
+
+.setting-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+}
+
+.select-setting{
+    border:1px solid rgba(148,163,184,.14);
+    background:#0f172a;
+    color:white;
+    padding:9px 12px;
+    border-radius:10px;
+}
+
+.light .select-setting{
+    background:white;
+    color:#0f172a;
+}
+
+/* Toast */
+
+.toast{
+    position:fixed;
+    left:50%;
+    bottom:22px;
+    transform:translate(-50%,20px);
+    opacity:0;
+    pointer-events:none;
+    z-index:200;
+    padding:12px 18px;
+    border-radius:13px;
+    background:#0f172a;
+    color:white;
+    border:1px solid rgba(148,163,184,.15);
+    box-shadow:0 15px 40px rgba(0,0,0,.3);
+    font-size:12px;
+    font-weight:700;
+    transition:.25s;
+}
+
+.toast.show{
+    opacity:1;
+    transform:translate(-50%,0);
+}
+
+/* Responsive */
+
+@media(max-width:700px){
+
+    .container{
+        width:min(100% - 18px,1180px);
+    }
+
+    .header-inner{
+        min-height:68px;
+    }
+
+    .brand-title{
+        font-size:15px;
+    }
+
+    .brand-subtitle{
+        font-size:9px;
+    }
+
+    .brand-icon{
+        width:42px;
+        height:42px;
+    }
+
+    .header-actions{
+        gap:5px;
+    }
+
+    .icon-btn{
+        width:38px;
+        height:38px;
+        border-radius:11px;
+    }
+
+    .hero{
+        padding-top:13px;
+    }
+
+    .hero h1{
+        font-size:24px;
+    }
+
+    .hero p{
+        font-size:11px;
+    }
+
+    .scan-card,
+    .report-card,
+    .recent-card{
+        padding:13px;
+        border-radius:22px;
+    }
+
+    .camera-box{
+        min-height:270px;
+        aspect-ratio:4/3;
+    }
+
+    .camera-image-grid{inset:7px;gap:7px;padding:6px;border-radius:17px;}
+    .camera-image-preview{border-radius:13px;}
+
+    .controls{
+        grid-template-columns:1fr;
+    }
+
+    .mode-row{
+        grid-template-columns:1fr;
+    }
+
+    .fields{
+        grid-template-columns:1fr;
+    }
+
+    .field.full{
+        grid-column:auto;
+    }
+
+    .image-list{
+        grid-template-columns:repeat(5,1fr);
+    }
+
+    .report-grid{
+        grid-template-columns:1fr;
+    }
+
+    .part-box{
+        grid-template-columns:1fr;
+    }
+
+    .report-actions{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .recent-item{
+        align-items:flex-start;
+    }
+}
+
+@media(min-width:701px){
+    .scan-card{
+        padding:22px;
+    }
+
+    .camera-box{
+        min-height:460px;
+    }
+}
+
+/* MODERN SETTINGS */
+.settings-modern{
+    max-width:560px;
+    border-radius:28px;
+    padding:22px;
+    background:rgba(15,23,42,.94);
+    border:1px solid rgba(148,163,184,.18);
+    box-shadow:0 30px 80px rgba(0,0,0,.42);
+    backdrop-filter:blur(24px);
+}
+.light .settings-modern{
+    background:rgba(255,255,255,.97);
+    border-color:#e2e8f0;
+    box-shadow:0 25px 65px rgba(15,23,42,.18);
+}
+.settings-modern .modal-header{
+    padding-bottom:16px;
+    margin-bottom:8px;
+    border-bottom:1px solid rgba(148,163,184,.12);
+}
+.setting-item{
+    padding:16px;
+    margin-top:12px;
+    border-radius:20px;
+    background:rgba(30,41,59,.48);
+    border:1px solid rgba(148,163,184,.12);
+    transition:.2s ease;
+}
+.light .setting-item{background:#f8fafc;border-color:#e2e8f0;}
+.setting-item:hover{transform:translateY(-1px);border-color:rgba(59,130,246,.35);}
+.select-setting{
+    min-width:145px;
+    height:46px;
+    padding:0 14px;
+    border-radius:14px;
+    border:1px solid rgba(96,165,250,.3);
+    background:linear-gradient(135deg,rgba(37,99,235,.18),rgba(79,70,229,.16));
+    color:#f8fafc;
+    font-weight:800;
+    outline:none;
+    cursor:pointer;
+}
+.light .select-setting{color:#1e293b;background:linear-gradient(135deg,#eff6ff,#eef2ff);border-color:#bfdbfe;}
+.select-setting:focus{box-shadow:0 0 0 4px rgba(59,130,246,.14);}
+#saveSettingsBtn{display:none!important;}
+
+/* FINAL SETTINGS UI */
+.settings-modern{
+    width:min(92vw,560px);
+    padding:20px;
+    border-radius:28px;
+    background:rgba(9,15,29,.96);
+    border:1px solid rgba(148,163,184,.18);
+    box-shadow:0 28px 90px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.04);
+    backdrop-filter:blur(22px);
+}
+.light .settings-modern{
+    background:rgba(255,255,255,.98);
+    border-color:#e2e8f0;
+    box-shadow:0 24px 70px rgba(15,23,42,.18), inset 0 1px 0 rgba(255,255,255,.8);
+}
+.settings-title-wrap{display:flex;align-items:center;gap:12px;min-width:0;}
+.settings-title-icon{
+    width:48px;height:48px;border-radius:15px;display:grid;place-items:center;
+    background:linear-gradient(135deg,#2563eb,#4f46e5);color:#fff;
+    box-shadow:0 10px 26px rgba(37,99,235,.25);
+}
+.settings-title-icon .material-symbols-outlined{font-size:25px;}
+.settings-modern .modal-header h2{margin:0;font-size:21px;font-weight:950;}
+.settings-subtitle{display:block;margin-top:3px;font-size:11px;color:#94a3b8;font-weight:700;}
+.light .settings-subtitle{color:#64748b;}
+.settings-modern .close-btn{flex:0 0 auto;}
+.settings-modern .setting-item-modern{
+    grid-template-columns:48px minmax(0,1fr) auto;
+    min-height:82px;margin-top:12px;padding:14px;
+    border-radius:20px;
+    background:linear-gradient(145deg,rgba(24,35,58,.9),rgba(15,23,42,.68));
+    border:1px solid rgba(148,163,184,.14);
+    box-shadow:0 12px 28px rgba(0,0,0,.14),inset 0 1px 0 rgba(255,255,255,.035);
+}
+.light .settings-modern .setting-item-modern{
+    background:linear-gradient(145deg,#fff,#f8fafc);
+    border-color:#e2e8f0;
+    box-shadow:0 10px 24px rgba(15,23,42,.07);
+}
+.settings-modern .setting-icon{width:46px;height:46px;border-radius:15px;}
+.settings-modern .select-setting{
+    min-width:132px;height:44px;border-radius:13px;padding:0 34px 0 12px;
+    border:1px solid rgba(96,165,250,.28);font-size:13px;
+}
+@media(max-width:560px){
+    .settings-modern{padding:15px;border-radius:24px;}
+    .settings-modern .setting-item-modern{grid-template-columns:44px minmax(0,1fr);gap:11px;}
+    .settings-modern .select-setting{grid-column:2;min-width:0;width:100%;height:42px;}
+    .settings-title-icon{width:44px;height:44px;border-radius:14px;}
+}
+
+/* EXTRA MODERN SETTINGS + CAMERA START */
+.settings-modern{
+    width:min(92vw,560px);
+    max-height:min(88vh,720px);
+    overflow:auto;
+    animation:settingsPop .22s ease-out;
+}
+@keyframes settingsPop{
+    from{opacity:0;transform:translateY(12px) scale(.97);}
+    to{opacity:1;transform:translateY(0) scale(1);}
+}
+.settings-modern .modal-header h2{
+    font-size:22px;
+    letter-spacing:-.3px;
+}
+.setting-item-modern{
+    display:grid;
+    grid-template-columns:48px minmax(0,1fr) auto;
+    align-items:center;
+    gap:14px;
+    min-height:86px;
+    padding:14px 16px;
+    background:linear-gradient(145deg,rgba(30,41,59,.72),rgba(15,23,42,.48));
+    border:1px solid rgba(148,163,184,.16);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 10px 25px rgba(0,0,0,.12);
+}
+.light .setting-item-modern{
+    background:linear-gradient(145deg,#ffffff,#f1f5f9);
+    border-color:#e2e8f0;
+    box-shadow:0 10px 25px rgba(15,23,42,.07);
+}
+.setting-icon{
+    width:48px;height:48px;border-radius:16px;
+    display:grid;place-items:center;
+    background:linear-gradient(135deg,rgba(59,130,246,.22),rgba(99,102,241,.18));
+    color:#93c5fd;
+    border:1px solid rgba(96,165,250,.2);
+}
+.light .setting-icon{color:#2563eb;background:linear-gradient(135deg,#eff6ff,#eef2ff);border-color:#dbeafe;}
+.setting-content{min-width:0;}
+.setting-content .setting-label{font-size:16px;font-weight:900;margin-bottom:4px;}
+.setting-content .setting-description{font-size:12px;line-height:1.5;opacity:.72;}
+.select-setting{
+    min-width:142px;height:46px;padding:0 38px 0 14px;
+    border-radius:15px;
+    border:1px solid rgba(96,165,250,.3);
+    background-color:#172033;
+    background-image:linear-gradient(135deg,rgba(37,99,235,.2),rgba(79,70,229,.14));
+    color:#f8fafc;
+    font-size:14px;font-weight:900;
+    box-shadow:0 6px 18px rgba(0,0,0,.12);
+}
+.light .select-setting{background-color:#fff;color:#1e293b;}
+.camera-placeholder{
+    display:flex;align-items:center;justify-content:center;
+    background:#172033;color:#cbd5e1;font-size:16px;font-weight:800;
+}
+.camera-placeholder-btn{
+    border:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:10px;
+    min-width:190px;min-height:54px;padding:0 22px;border-radius:17px;
+    color:#fff;background:linear-gradient(135deg,#2563eb,#4f46e5);
+    font:inherit;font-weight:900;box-shadow:0 12px 28px rgba(37,99,235,.28);
+    transition:transform .18s ease,box-shadow .18s ease,filter .18s ease;
+}
+.camera-placeholder-btn:hover{transform:translateY(-2px);box-shadow:0 16px 34px rgba(37,99,235,.34);filter:brightness(1.04);}
+.camera-placeholder-btn:active{transform:scale(.98);}
+.light .camera-placeholder{background:#e8edf4;color:#475569;}
+.camera-placeholder .material-symbols-outlined{display:inline-flex;}
+.camera-box:not(.camera-active) .scanner-line,.camera-box:not(.camera-active) .camera-corners{display:none!important;}
+
+/* SOLID CAMERA READY STATE */
+.camera-box{background:#172033!important;}
+.light .camera-box{background:#e8edf4!important;}
+.camera-placeholder{
+    background:#172033;
+    color:#cbd5e1;
+    font-size:16px;
+    font-weight:800;
+}
+.light .camera-placeholder{background:#e8edf4;color:#475569;}
+.camera-placeholder .material-symbols-outlined{display:none;}
+.camera-box:not(.camera-active) .scanner-line,
+.camera-box:not(.camera-active) .camera-corners{display:none!important;}
+
+.scan-action-disabled{opacity:.58!important;filter:saturate(.72);}
+.scan-action-disabled:active{transform:none!important;}
+#captureBtn:not(.scan-action-disabled){opacity:1!important;filter:none!important;cursor:pointer!important;}
+#captureBtn:not(.scan-action-disabled):hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(239,68,68,.22);}
+#analyzeBtn:not(.scan-action-disabled){opacity:1!important;filter:none!important;cursor:pointer!important;}
+.analyze-controls{margin-top:14px;}
+.analyze-controls .btn{width:100%;min-height:54px;font-size:14px;}
+
+
+/* MODERN IMAGE ADDED NOTIFICATION */
+.toast.success-toast{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    min-width:min(360px,calc(100vw - 28px));
+    justify-content:center;
+    padding:13px 17px;
+    border-radius:17px;
+    background:linear-gradient(135deg,rgba(5,150,105,.96),rgba(16,185,129,.92));
+    border:1px solid rgba(167,243,208,.35);
+    box-shadow:0 18px 45px rgba(5,150,105,.28),0 8px 22px rgba(0,0,0,.25);
+    font-size:13px;
+    font-weight:900;
+}
+.toast.success-toast .toast-icon{
+    width:28px;
+    height:28px;
+    border-radius:10px;
+    display:grid;
+    place-items:center;
+    background:rgba(255,255,255,.18);
+    flex:0 0 auto;
+}
+.toast.success-toast .material-symbols-outlined{font-size:18px;}
+.camera-placeholder-title{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:52px;
+    padding:0 18px;
+    border-radius:16px;
+    background:rgba(30,41,59,.55);
+    border:1px dashed rgba(148,163,184,.28);
+    color:#cbd5e1;
+    font-size:14px;
+    font-weight:800;
+}
+.light .camera-placeholder-title{
+    background:rgba(255,255,255,.65);
+    color:#475569;
+    border-color:#cbd5e1;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header>
+    <div class="container header-inner">
+
+        <div class="brand">
+            <div class="brand-icon">
+                <span class="material-symbols-outlined">radar</span>
+            </div>
+
+            <div>
+                <div class="brand-title" data-i18n="appName">
+                    نظام التشخيص الذكي
+                </div>
+
+                <div class="brand-subtitle" data-i18n="appSubtitle">
+                    تحليل الأعطال والمكونات
+                </div>
+            </div>
+        </div>
+
+        <div class="header-actions">
+
+            <button class="icon-btn" id="settingsBtn" title="الإعدادات">
+                <span class="material-symbols-outlined">settings</span>
+            </button>
+
+            <button class="icon-btn" id="trashBtn" title="Trash">
+                <span class="material-symbols-outlined">delete</span>
+            </button>
+
+        </div>
+
+    </div>
+</header>
+
+
+<main class="container">
+
+    <section class="hero">
+
+        <h1 data-i18n="heroTitle">
+            شخّص العطل بسهولة
+        </h1>
+
+        <p data-i18n="heroDescription">
+            التقط صورة للجزء أو العطل، أو اختر صورة من جهازك للحصول على تقرير تشخيصي منظم.
+        </p>
+
+    </section>
+
+
+    <!-- SCANNER -->
+
+    <section class="glass scan-card">
+
+        <div class="section-title">
+
+            <h2 data-i18n="scanTitle">
+                بدء التشخيص
+            </h2>
+
+            <span data-i18n="upToFive">
+                حتى 5 صور
+            </span>
+
+        </div>
+
+
+        <div class="camera-box" id="cameraBox">
+
+            <video id="video" autoplay playsinline muted></video>
+
+            <img id="capturedImage" alt="Captured">
+
+            <div class="camera-image-grid" id="cameraImageGrid" aria-label="Selected images"></div>
+
+            <div class="camera-placeholder" id="cameraPlaceholder">
+                <span class="camera-placeholder-title" data-i18n="chooseImageHint">
+                    اختر صورة من المعرض لبدء التشخيص
+                </span>
+            </div>
+
+
+            <div class="scanner-line"></div>
+
+            <div class="camera-corners">
+
+                <div class="corner tl"></div>
+                <div class="corner tr"></div>
+                <div class="corner bl"></div>
+                <div class="corner br"></div>
+
+            </div>
+
+
+            <div class="loading" id="loading">
+
+                <div class="loader"></div>
+
+                <strong data-i18n="analyzing">
+                    جاري تحليل الصور...
+                </strong>
+
+                <small data-i18n="pleaseWait">
+                    يرجى الانتظار
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <!-- SELECTED IMAGES PREVIEW: always appears before the camera/gallery controls -->
+        <div class="selected-images-area" id="selectedImagesArea" aria-live="polite">
+            <div class="selected-images-main" id="selectedImagesMain">
+                <span class="material-symbols-outlined">image</span>
+                <span data-i18n="chooseImageHint">اختر صورة من المعرض لبدء التشخيص</span>
+            </div>
+            <div class="selected-images-thumbs" id="selectedImagesThumbs"></div>
+        </div>
+
+
+        <div class="controls">
+
+            <button class="btn btn-primary" id="cameraBtn">
+
+                <span class="material-symbols-outlined">
+                    photo_camera
+                </span>
+
+                <span data-i18n="startCamera">
+                    تشغيل الكاميرا
+                </span>
+
+            </button>
+
+
+            <button class="btn btn-secondary" id="galleryBtn">
+
+                <span class="material-symbols-outlined">
+                    photo_library
+                </span>
+
+                <span data-i18n="gallery">
+                    اختيار من المعرض
+                </span>
+
+            </button>
+
+
+
+        </div>
+
+
+        <input
+            type="file"
+            id="galleryInput"
+            accept="image/*"
+            multiple
+            hidden
+        >
+
+        <input
+            type="file"
+            id="cameraInput"
+            accept="image/*"
+            capture="environment"
+            hidden
+        >
+
+
+        <div class="controls" style="margin-top:10px;">
+
+            <button class="btn btn-danger" id="captureBtn" aria-disabled="true">
+
+                <span class="material-symbols-outlined">
+                    close
+                </span>
+
+                <span data-i18n="cancelScan">
+                    Cancel Scan
+                </span>
+
+            </button>
+
+        </div>
+
+
+        <div class="image-list" id="imageList"></div>
+
+
+        <!-- MODE -->
+
+        <div class="mode-row">
+
+            <div class="mode active" id="fastMode">
+
+                <div class="mode-title">
+                    ⚡ <span data-i18n="fastMode">Fast Diagnosis</span>
+                </div>
+
+                <div class="mode-description" data-i18n="fastDescription">
+                    Quick direct analysis
+                </div>
+
+            </div>
+
+
+            <div class="mode" id="advancedMode">
+
+                <div class="mode-title">
+                    🧠 <span data-i18n="advancedMode">Advanced Diagnosis</span>
+                </div>
+
+                <div class="mode-description" data-i18n="advancedDescription">
+                    More information for better results
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ADVANCED -->
+
+        <div class="advanced-panel" id="advancedPanel">
+
+            <div class="fields">
+
+                <div class="field">
+
+                    <label data-i18n="deviceType">
+                        نوع الجهاز
+                    </label>
+
+                    <select id="deviceType">
+
+                        <option value="" data-i18n="select">
+                            اختر
+                        </option>
+
+                        <option value="car" data-i18n="car">
+                            سيارة
+                        </option>
+
+                        <option value="truck" data-i18n="truck">
+                            شاحنة
+                        </option>
+
+                        <option value="machine" data-i18n="machine">
+                            آلة / معدة
+                        </option>
+
+                        <option value="electrical" data-i18n="electrical">
+                            جهاز كهربائي
+                        </option>
+
+                        <option value="other" data-i18n="other">
+                            أخرى
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label data-i18n="brand">
+                        الشركة المصنعة
+                    </label>
+
+                    <input
+                        id="brand"
+                        type="text"
+                        placeholder="Toyota / Samsung..."
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label data-i18n="model">
+                        الموديل
+                    </label>
+
+                    <input
+                        id="model"
+                        type="text"
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label data-i18n="year">
+                        سنة الصنع
+                    </label>
+
+                    <input
+                        id="year"
+                        type="number"
+                        inputmode="numeric"
+                    >
+
+                </div>
+
+
+                <div class="field full">
+
+                    <label data-i18n="symptoms">
+                        الأعراض أو المشكلة
+                    </label>
+
+                    <textarea
+                        id="symptoms"
+                        placeholder="اكتب ما تلاحظه..."
+                    ></textarea>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    
+        <div class="controls analyze-controls">
+            <button class="btn btn-success" id="analyzeBtn" aria-disabled="true">
+                <span class="material-symbols-outlined">
+                    auto_awesome
+                </span>
+                <span data-i18n="analyze">
+                    تحليل وتشخيص
+                </span>
+            </button>
+        </div>
+
+</section>
+
+
+    <!-- REPORT -->
+
+    <section class="report-section" id="reportSection">
+
+        <div class="glass report-card">
+
+            <div class="report-header">
+
+                <div>
+
+                    <h2 id="issueName">
+                        —
+                    </h2>
+
+                    <p id="reportDate">
+                        —
+                    </p>
+
+                </div>
+
+                <div class="severity" id="severity">
+                    —
+                </div>
+
+            </div>
+
+
+            <div class="report-grid">
+
+                <div class="info-box">
+
+                    <div class="info-label" data-i18n="affectedPart">
+                        الجزء المتأثر
+                    </div>
+
+                    <div class="info-value" id="affectedPart">
+                        —
+                    </div>
+
+                </div>
+
+
+                <div class="info-box">
+
+                    <div class="info-label" data-i18n="location">
+                        موقع الجزء
+                    </div>
+
+                    <div class="info-value" id="partLocation">
+                        —
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="confidence-wrap">
+
+                <div class="confidence-top">
+
+                    <span data-i18n="confidence">
+                        درجة الثقة
+                    </span>
+
+                    <strong id="confidenceValue">
+                        0%
+                    </strong>
+
+                </div>
+
+                <div class="progress">
+                    <span id="confidenceBar"></span>
+                </div>
+
+            </div>
+
+
+            <!-- WHY -->
+
+            <div class="report-block">
+
+                <h3 data-i18n="whyDiagnosis">
+                    لماذا ظهر هذا التشخيص؟
+                </h3>
+
+                <ul class="reason-list" id="reasonList"></ul>
+
+            </div>
+
+
+            <!-- PART -->
+
+            <div class="report-block">
+
+                <h3 data-i18n="replacementPart">
+                    قطعة الغيار المقترحة
+                </h3>
+
+                <div class="part-box">
+
+                    <div class="info-box">
+
+                        <div class="info-label" data-i18n="partNumber">
+                            رقم القطعة
+                        </div>
+
+                        <div class="info-value" id="partNumber">
+                            —
+                        </div>
+
+                    </div>
+
+
+                    <div class="info-box">
+
+                        <div class="info-label" data-i18n="partBrand">
+                            العلامة
+                        </div>
+
+                        <div class="info-value" id="partBrand">
+                            —
+                        </div>
+
+                    </div>
+
+
+                    <div class="info-box">
+
+                        <div class="info-label" data-i18n="price">
+                            السعر
+                        </div>
+
+                        <div class="info-value" id="partPrice">
+                            —
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- STEPS -->
+
+            <div class="report-block">
+
+                <h3 data-i18n="repairSteps">
+                    خطوات الفحص / الإصلاح
+                </h3>
+
+                <ol class="steps" id="stepsList"></ol>
+
+            </div>
+
+
+            <div class="report-actions">
+
+                <button class="btn btn-primary" id="saveReportBtn">
+
+                    <span class="material-symbols-outlined">
+                        save
+                    </span>
+
+                    <span data-i18n="save">
+                        حفظ
+                    </span>
+
+                </button>
+
+
+                <button class="btn btn-secondary" id="printReportBtn">
+
+                    <span class="material-symbols-outlined">
+                        print
+                    </span>
+
+                    <span data-i18n="print">
+                        طباعة
+                    </span>
+
+                </button>
+
+
+                <button class="btn btn-secondary" id="shareReportBtn">
+
+                    <span class="material-symbols-outlined">
+                        share
+                    </span>
+
+                    <span data-i18n="share">
+                        مشاركة
+                    </span>
+
+                </button>
+
+
+                <button class="btn btn-secondary" id="newScanBtn">
+
+                    <span class="material-symbols-outlined">
+                        add_a_photo
+                    </span>
+
+                    <span data-i18n="newScan">
+                        تشخيص جديد
+                    </span>
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- RECENT DIAGNOSES -->
+
+    <section class="recent-section">
+
+        <div class="glass recent-card">
+
+            <div class="section-title">
+
+                <h2 data-i18n="recentTitle">
+                    آخر عمليات التشخيص
+                </h2>
+
+                <button
+                    class="small-btn delete"
+                    id="clearHistoryBtn"
+                    title="حذف السجل"
+                >
+
+                    <span class="material-symbols-outlined">
+                        delete_sweep
+                    </span>
+
+                </button>
+
+            </div>
+
+
+            <div class="recent-list" id="recentList">
+
+                <div class="recent-empty">
+
+                    <span
+                        class="material-symbols-outlined"
+                        style="font-size:38px;display:block;margin-bottom:8px;"
+                    >
+                        history
+                    </span>
+
+                    <span data-i18n="noHistory">
+                        لا توجد عمليات تشخيص محفوظة حتى الآن
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<footer>
+
+    <span data-i18n="demoNotice">
+        النسخة الحالية تجريبية، ومحرك التشخيص الحقيقي يمكن ربطه لاحقًا بخدمة AI آمنة.
+    </span>
+
+</footer>
+
+</div>
+
+
+<!-- SETTINGS MODAL -->
+
+<div class="modal" id="settingsModal">
+
+    <div class="glass modal-card settings-modern">
+
+        <div class="modal-header">
+
+            <div class="settings-title-wrap">
+                <div class="settings-title-icon">
+                    <span class="material-symbols-outlined">tune</span>
+                </div>
+                <div>
+                    <h2 data-i18n="settings">
+                        الإعدادات
+                    </h2>
+                    <small class="settings-subtitle" data-i18n="appearanceDesc">
+                        التبديل بين الوضع الفاتح والداكن
+                    </small>
+                </div>
+            </div>
+
+            <button class="close-btn" id="closeSettings">
+                ×
+            </button>
+
+        </div>
+
+
+        <div class="setting-item-modern">
+
+            <div class="setting-icon">
+                <span class="material-symbols-outlined">dark_mode</span>
+            </div>
+
+            <div class="setting-content">
+                <div class="setting-label" data-i18n="appearance">
+                    المظهر
+                </div>
+                <div class="setting-description" data-i18n="appearanceDesc">
+                    التبديل بين الوضع الفاتح والداكن
+                </div>
+            </div>
+
+            <select class="select-setting" id="themeSelect" aria-label="Theme">
+                <option value="dark" data-i18n="dark">داكن</option>
+                <option value="light" data-i18n="light">فاتح</option>
+            </select>
+
+        </div>
+
+
+        <div class="setting-item-modern">
+
+            <div class="setting-icon language-icon">
+                <span class="material-symbols-outlined">language</span>
+            </div>
+
+            <div class="setting-content">
+                <div class="setting-label" data-i18n="language">
+                    اللغة
+                </div>
+                <div class="setting-description" data-i18n="languageDesc">
+                    لغة التطبيق
+                </div>
+            </div>
+
+            <select class="select-setting" id="languageSelect" aria-label="Language">
+                <option value="ar">العربية</option>
+                <option value="en">English</option>
+                <option value="fr">Français</option>
+                <option value="es">Español</option>
+                <option value="de">Deutsch</option>
+            </select>
+
+        </div>
+
+        <div class="setting-item-modern">
+            <div class="setting-icon">
+                <span class="material-symbols-outlined">dns</span>
+            </div>
+            <div class="setting-content">
+                <div class="setting-label" data-i18n="diagnosticServer">خادم التشخيص</div>
+                <div class="setting-description" data-i18n="diagnosticServerDesc">أدخل رابط خادم الذكاء الاصطناعي إذا كان التطبيق متصلاً بخادم خارجي</div>
+            </div>
+            <input class="select-setting" id="diagnosticApiUrlInput" type="url" inputmode="url" placeholder="https://example.com" style="height:46px;width:100%;padding:0 12px;">
+        </div>
+        <button id="saveDiagnosticApiUrlBtn" class="primary-btn" data-i18n="saveDiagnosticServer" style="width:100%;margin-top:12px;">حفظ رابط الخادم</button>
+
+    </div>
+
+</div>
+
+
+<!-- TRASH MODAL -->
+<div class="modal" id="trashModal">
+    <div class="glass modal-card">
+        <div class="modal-header">
+            <h2 data-i18n="trash">Trash</h2>
+            <button class="close-btn" id="closeTrash">×</button>
+        </div>
+        <div id="trashList"></div>
+    </div>
+</div>
+
+
+<!-- HISTORY REPORT MODAL -->
+
+<div class="modal" id="historyModal">
+
+    <div class="glass modal-card">
+
+        <div class="modal-header">
+
+            <h2 data-i18n="savedReport">
+                التقرير المحفوظ
+            </h2>
+
+            <button class="close-btn" id="closeHistory">
+                ×
+            </button>
+
+        </div>
+
+
+        <div id="historyReportContent"></div>
+
+    </div>
+
+</div>
+
+
+<div class="toast" id="toast"></div>
+
+
+<script>
+
+const translations = {
+
+    ar:{
+        appName:"نظام التشخيص الذكي",
+        appSubtitle:"تحليل الأعطال والمكونات",
+        heroTitle:"شخّص العطل بسهولة",
+        heroDescription:"التقط صورة للجزء أو العطل، أو اختر صورة من جهازك للحصول على تقرير تشخيصي منظم.",
+        scanTitle:"بدء التشخيص",
+        upToFive:"حتى 5 صور",
+        cameraReady:"الكاميرا جاهزة للتشخيص",
+        startCamera:"تشغيل الكاميرا",
+        gallery:"اختيار من المعرض",
+        analyze:"تحليل وتشخيص",
+        capture:"التقاط صورة",
+        retake:"إعادة الالتقاط",
+        cancelScan:"إلغاء الفحص",
+        stopCamera:"إيقاف الكاميرا",
+        scanCancelled:"تم إلغاء الفحص",
+        trash:"سلة المحذوفات",
+        restore:"استعادة",
+        deleteForever:"حذف نهائي",
+        trashEmpty:"سلة المحذوفات فارغة",
+        restored:"تمت استعادة التقرير",
+        permanentlyDeleted:"تم حذف التقرير نهائيًا",
+        trashCleared:"تم نقل التقارير إلى السلة",
+        fastMode:"تشخيص سريع",
+        fastDescription:"تحليل سريع ومباشر",
+        advancedMode:"تشخيص متقدم",
+        advancedDescription:"معلومات إضافية لنتيجة أدق",
+        deviceType:"نوع الجهاز",
+        brand:"الشركة المصنعة",
+        model:"الموديل",
+        year:"سنة الصنع",
+        symptoms:"الأعراض أو المشكلة",
+        select:"اختر",
+        car:"سيارة",
+        truck:"شاحنة",
+        machine:"آلة / معدة",
+        electrical:"جهاز كهربائي",
+        other:"أخرى",
+        analyzing:"جاري تحليل الصور...",
+        pleaseWait:"يرجى الانتظار",
+        affectedPart:"الجزء المتأثر",
+        location:"موقع الجزء",
+        confidence:"درجة الثقة",
+        whyDiagnosis:"لماذا ظهر هذا التشخيص؟",
+        replacementPart:"قطعة الغيار المقترحة",
+        partNumber:"رقم القطعة",
+        partBrand:"العلامة",
+        price:"السعر",
+        repairSteps:"خطوات الفحص / الإصلاح",
+        save:"حفظ",
+        print:"طباعة",
+        share:"مشاركة",
+        newScan:"تشخيص جديد",
+        recentTitle:"آخر عمليات التشخيص",
+        noHistory:"لا توجد عمليات تشخيص محفوظة حتى الآن",
+        settings:"الإعدادات",
+        appearance:"المظهر",
+        appearanceDesc:"التبديل بين الوضع الفاتح والداكن",
+        dark:"داكن",
+        light:"فاتح",
+        language:"اللغة",
+        languageDesc:"لغة التطبيق",
+        diagnosticServer:"خادم التشخيص",
+        diagnosticServerDesc:"أدخل رابط خادم الذكاء الاصطناعي إذا كان التطبيق متصلاً بخادم خارجي",
+        saveDiagnosticServer:"حفظ رابط الخادم",
+        saveClose:"حفظ وإغلاق",
+        savedReport:"التقرير المحفوظ",
+        demoNotice:"النسخة الحالية تجريبية، ومحرك التشخيص الحقيقي يمكن ربطه لاحقًا بخدمة AI آمنة.",
+        saved:"تم حفظ التقرير بنجاح",
+        deleted:"تم حذف التقرير",
+        historyCleared:"تم حذف سجل التشخيص",
+        noReport:"لا يوجد تقرير",
+        cameraError:"تعذر تشغيل الكاميرا",
+        selectImage:"اختر صورة أولًا",
+        chooseImageHint:"اختر صورة من المعرض لبدء التشخيص",
+        diagnosisReady:"تم إنشاء التقرير التشخيصي",
+        high:"مرتفع",
+        medium:"متوسط",
+        low:"منخفض",
+        timingIssue:"وجود علامات تآكل أو تشقق في سير التوقيت",
+        timingPart:"سير توقيت المحرك",
+        engineFront:"الجزء الأمامي من المحرك",
+        reason1:"تظهر علامات تآكل على الجزء الذي تم فحصه.",
+        reason2:"شكل المكون يتوافق مع مكونات نظام التوقيت.",
+        reason3:"الأعراض المدخلة تدعم احتمال وجود المشكلة.",
+        step1:"إيقاف الجهاز وفصل مصدر الطاقة قبل بدء العمل.",
+        step2:"فحص الجزء المحيط والتأكد من عدم وجود تلف إضافي.",
+        step3:"مقارنة القطعة بالمواصفات ورقم القطعة الصحيح.",
+        step4:"استبدال القطعة إذا أكد الفحص المباشر وجود التلف.",
+        step5:"إجراء اختبار نهائي بعد التركيب.",
+        partBrandDemo:"قاعدة قطع تجريبية",
+        priceUnknown:"السعر يحدد حسب المورد",
+        view:"عرض التقرير",
+        delete:"حذف",
+        reportOpened:"تم فتح التقرير",
+        shareCopied:"تم نسخ التقرير",
+        shareFailed:"تعذرت المشاركة"
+    },
+
+
+    en:{
+        appName:"Smart Diagnostic System",
+        appSubtitle:"Fault & Component Analysis",
+        heroTitle:"Diagnose the Problem Easily",
+        heroDescription:"Capture the faulty part or select an image to generate an organized diagnostic report.",
+        scanTitle:"Start Diagnosis",
+        upToFive:"Up to 5 images",
+        cameraReady:"Camera ready",
+        startCamera:"Start Camera",
+        gallery:"Choose from Gallery",
+        analyze:"Analyze",
+        capture:"Capture",
+        retake:"Retake",
+        cancelScan:"Cancel Scan",
+        stopCamera:"Stop Camera",
+        scanCancelled:"Scan cancelled",
+        trash:"Trash",
+        restore:"Restore",
+        deleteForever:"Delete Permanently",
+        trashEmpty:"Trash is empty",
+        restored:"Report restored",
+        permanentlyDeleted:"Report permanently deleted",
+        trashCleared:"Reports moved to Trash",
+        fastMode:"Fast Diagnosis",
+        fastDescription:"Quick direct analysis",
+        advancedMode:"Advanced Diagnosis",
+        advancedDescription:"More information for better results",
+        deviceType:"Device Type",
+        brand:"Manufacturer",
+        model:"Model",
+        year:"Manufacturing Year",
+        symptoms:"Symptoms / Problem",
+        select:"Select",
+        car:"Car",
+        truck:"Truck",
+        machine:"Machine / Equipment",
+        electrical:"Electrical Device",
+        other:"Other",
+        analyzing:"Analyzing images...",
+        pleaseWait:"Please wait",
+        affectedPart:"Affected Part",
+        location:"Part Location",
+        confidence:"Confidence",
+        whyDiagnosis:"Why this diagnosis?",
+        replacementPart:"Suggested Spare Part",
+        partNumber:"Part Number",
+        partBrand:"Brand",
+        price:"Price",
+        repairSteps:"Inspection / Repair Steps",
+        save:"Save",
+        print:"Print",
+        share:"Share",
+        newScan:"New Scan",
+        recentTitle:"Recent Diagnoses",
+        noHistory:"No saved diagnoses yet",
+        settings:"Settings",
+        appearance:"Appearance",
+        appearanceDesc:"Switch between light and dark mode",
+        dark:"Dark",
+        light:"Light",
+        language:"Language",
+        languageDesc:"Application language",
+        diagnosticServer:"Diagnostic server",
+        diagnosticServerDesc:"Enter the AI server URL when the app uses an external server",
+        saveDiagnosticServer:"Save server URL",
+        saveClose:"Save & Close",
+        savedReport:"Saved Report",
+        demoNotice:"This version is a demo. A real diagnostic AI engine can be connected later through a secure service.",
+        saved:"Report saved",
+        deleted:"Report deleted",
+        historyCleared:"Diagnostic history cleared",
+        noReport:"No report",
+        cameraError:"Unable to start camera",
+        selectImage:"Select an image first",
+        diagnosisReady:"Diagnostic report generated",
+        high:"High",
+        medium:"Medium",
+        low:"Low",
+        timingIssue:"Signs of wear or cracking in the timing belt",
+        timingPart:"Engine Timing Belt",
+        engineFront:"Front engine area",
+        reason1:"Visible wear signs appear on the inspected component.",
+        reason2:"The component shape is consistent with timing-system components.",
+        reason3:"The entered symptoms support the possibility of this issue.",
+        step1:"Stop the device and disconnect the power source.",
+        step2:"Inspect surrounding components for additional damage.",
+        step3:"Compare the component with the correct specification and part number.",
+        step4:"Replace the component if physical inspection confirms the damage.",
+        step5:"Perform a final test after installation.",
+        partBrandDemo:"Demo Parts Database",
+        priceUnknown:"Price depends on supplier",
+        view:"View",
+        delete:"Delete",
+        reportOpened:"Report opened",
+        shareCopied:"Report copied",
+        shareFailed:"Unable to share"
+    },
+
+
+    fr:{
+        appName:"Système de diagnostic intelligent",
+        appSubtitle:"Analyse des pannes et composants",
+        heroTitle:"Diagnostiquez facilement",
+        heroDescription:"Prenez une photo ou sélectionnez une image pour générer un rapport.",
+        scanTitle:"Commencer le diagnostic",
+        upToFive:"Jusqu'à 5 images",
+        cameraReady:"Caméra prête",
+        startCamera:"Démarrer caméra",
+        gallery:"Galerie",
+        analyze:"Analyser",
+        capture:"Capturer",
+        retake:"Reprendre",
+        cancelScan:"Annuler le diagnostic",
+        stopCamera:"Arrêter la caméra",
+        scanCancelled:"Diagnostic annulé",
+        trash:"Corbeille",
+        restore:"Restaurer",
+        deleteForever:"Supprimer définitivement",
+        trashEmpty:"La corbeille est vide",
+        restored:"Rapport restauré",
+        permanentlyDeleted:"Rapport supprimé définitivement",
+        trashCleared:"Rapports déplacés vers la corbeille",
+        fastMode:"Diagnostic rapide",
+        fastDescription:"Analyse rapide",
+        advancedMode:"Diagnostic avancé",
+        advancedDescription:"Plus d'informations",
+        deviceType:"Type d'appareil",
+        brand:"Fabricant",
+        model:"Modèle",
+        year:"Année",
+        symptoms:"Symptômes / problème",
+        select:"Sélectionner",
+        car:"Voiture",
+        truck:"Camion",
+        machine:"Machine",
+        electrical:"Appareil électrique",
+        other:"Autre",
+        analyzing:"Analyse des images...",
+        pleaseWait:"Veuillez patienter",
+        affectedPart:"Pièce concernée",
+        location:"Emplacement",
+        confidence:"Confiance",
+        whyDiagnosis:"Pourquoi ce diagnostic ?",
+        replacementPart:"Pièce de rechange",
+        partNumber:"Référence",
+        partBrand:"Marque",
+        price:"Prix",
+        repairSteps:"Étapes",
+        save:"Enregistrer",
+        print:"Imprimer",
+        share:"Partager",
+        newScan:"Nouveau diagnostic",
+        recentTitle:"Diagnostics récents",
+        noHistory:"Aucun diagnostic enregistré",
+        settings:"Paramètres",
+        appearance:"Apparence",
+        appearanceDesc:"Mode clair ou sombre",
+        dark:"Sombre",
+        light:"Clair",
+        language:"Langue",
+        languageDesc:"Langue de l'application",
+        diagnosticServer:"Serveur de diagnostic",
+        diagnosticServerDesc:"Entrez l’URL du serveur IA si l’application utilise un serveur externe",
+        saveDiagnosticServer:"Enregistrer l’URL",
+        saveClose:"Enregistrer et fermer",
+        savedReport:"Rapport enregistré",
+        demoNotice:"Version de démonstration. Un moteur IA réel peut être connecté ultérieurement.",
+        saved:"Rapport enregistré",
+        deleted:"Rapport supprimé",
+        historyCleared:"Historique supprimé",
+        noReport:"Aucun rapport",
+        cameraError:"Impossible de démarrer la caméra",
+        selectImage:"Sélectionnez une image",
+        diagnosisReady:"Rapport généré",
+        high:"Élevé",
+        medium:"Moyen",
+        low:"Faible",
+        timingIssue:"Signes d'usure ou de fissure de la courroie de distribution",
+        timingPart:"Courroie de distribution",
+        engineFront:"Partie avant du moteur",
+        reason1:"Des signes d'usure sont visibles.",
+        reason2:"La forme correspond au système de distribution.",
+        reason3:"Les symptômes saisis soutiennent cette possibilité.",
+        step1:"Arrêter l'appareil et couper l'alimentation.",
+        step2:"Inspecter les composants voisins.",
+        step3:"Comparer avec la bonne référence.",
+        step4:"Remplacer si les dommages sont confirmés.",
+        step5:"Effectuer un test final.",
+        partBrandDemo:"Base de démonstration",
+        priceUnknown:"Prix selon fournisseur",
+        view:"Voir",
+        delete:"Supprimer",
+        reportOpened:"Rapport ouvert",
+        shareCopied:"Rapport copié",
+        shareFailed:"Partage impossible"
+    },
+
+
+    es:{
+        appName:"Sistema de diagnóstico inteligente",
+        appSubtitle:"Análisis de fallos y componentes",
+        heroTitle:"Diagnostica el problema fácilmente",
+        heroDescription:"Toma una foto o selecciona una imagen para generar un informe.",
+        scanTitle:"Iniciar diagnóstico",
+        upToFive:"Hasta 5 imágenes",
+        cameraReady:"Cámara lista",
+        startCamera:"Iniciar cámara",
+        gallery:"Galería",
+        analyze:"Analizar",
+        capture:"Capturar",
+        retake:"Repetir",
+        cancelScan:"Cancelar diagnóstico",
+        stopCamera:"Detener cámara",
+        scanCancelled:"Diagnóstico cancelado",
+        trash:"Papelera",
+        restore:"Restaurar",
+        deleteForever:"Eliminar permanentemente",
+        trashEmpty:"La papelera está vacía",
+        restored:"Informe restaurado",
+        permanentlyDeleted:"Informe eliminado permanentemente",
+        trashCleared:"Informes movidos a la papelera",
+        fastMode:"Diagnóstico rápido",
+        fastDescription:"Análisis rápido",
+        advancedMode:"Diagnóstico avanzado",
+        advancedDescription:"Más información",
+        deviceType:"Tipo de dispositivo",
+        brand:"Fabricante",
+        model:"Modelo",
+        year:"Año",
+        symptoms:"Síntomas / problema",
+        select:"Seleccionar",
+        car:"Coche",
+        truck:"Camión",
+        machine:"Máquina",
+        electrical:"Dispositivo eléctrico",
+        other:"Otro",
+        analyzing:"Analizando imágenes...",
+        pleaseWait:"Espere",
+        affectedPart:"Parte afectada",
+        location:"Ubicación",
+        confidence:"Confianza",
+        whyDiagnosis:"¿Por qué este diagnóstico?",
+        replacementPart:"Repuesto sugerido",
+        partNumber:"Número de pieza",
+        partBrand:"Marca",
+        price:"Precio",
+        repairSteps:"Pasos de reparación",
+        save:"Guardar",
+        print:"Imprimir",
+        share:"Compartir",
+        newScan:"Nuevo diagnóstico",
+        recentTitle:"Diagnósticos recientes",
+        noHistory:"No hay diagnósticos guardados",
+        settings:"Configuración",
+        appearance:"Apariencia",
+        appearanceDesc:"Modo claro u oscuro",
+        dark:"Oscuro",
+        light:"Claro",
+        language:"Idioma",
+        languageDesc:"Idioma de la aplicación",
+        diagnosticServer:"Servidor de diagnóstico",
+        diagnosticServerDesc:"Introduce la URL del servidor de IA si la aplicación usa un servidor externo",
+        saveDiagnosticServer:"Guardar URL",
+        saveClose:"Guardar y cerrar",
+        savedReport:"Informe guardado",
+        demoNotice:"Versión de demostración. Se puede conectar un motor de IA real posteriormente.",
+        saved:"Informe guardado",
+        deleted:"Informe eliminado",
+        historyCleared:"Historial eliminado",
+        noReport:"Sin informe",
+        cameraError:"No se pudo iniciar la cámara",
+        selectImage:"Seleccione una imagen",
+        diagnosisReady:"Informe generado",
+        high:"Alto",
+        medium:"Medio",
+        low:"Bajo",
+        timingIssue:"Signos de desgaste o grietas en la correa de distribución",
+        timingPart:"Correa de distribución",
+        engineFront:"Parte delantera del motor",
+        reason1:"Se observan signos de desgaste.",
+        reason2:"La forma coincide con componentes del sistema de distribución.",
+        reason3:"Los síntomas introducidos apoyan esta posibilidad.",
+        step1:"Detenga el dispositivo y desconecte la alimentación.",
+        step2:"Inspeccione los componentes cercanos.",
+        step3:"Compare con la referencia correcta.",
+        step4:"Reemplace si se confirma el daño.",
+        step5:"Realice una prueba final.",
+        partBrandDemo:"Base de demostración",
+        priceUnknown:"Precio según proveedor",
+        view:"Ver",
+        delete:"Eliminar",
+        reportOpened:"Informe abierto",
+        shareCopied:"Informe copiado",
+        shareFailed:"No se pudo compartir"
+    },
+
+
+    de:{
+        appName:"Intelligentes Diagnosesystem",
+        appSubtitle:"Fehler- und Komponentenanalyse",
+        heroTitle:"Problem einfach diagnostizieren",
+        heroDescription:"Foto aufnehmen oder Bild auswählen, um einen Diagnosebericht zu erstellen.",
+        scanTitle:"Diagnose starten",
+        upToFive:"Bis zu 5 Bilder",
+        cameraReady:"Kamera bereit",
+        startCamera:"Kamera starten",
+        gallery:"Galerie",
+        analyze:"Analysieren",
+        capture:"Aufnehmen",
+        retake:"Neu aufnehmen",
+        cancelScan:"Diagnose abbrechen",
+        stopCamera:"Kamera stoppen",
+        scanCancelled:"Diagnose abgebrochen",
+        trash:"Papierkorb",
+        restore:"Wiederherstellen",
+        deleteForever:"Endgültig löschen",
+        trashEmpty:"Der Papierkorb ist leer",
+        restored:"Bericht wiederhergestellt",
+        permanentlyDeleted:"Bericht endgültig gelöscht",
+        trashCleared:"Berichte in den Papierkorb verschoben",
+        fastMode:"Schnelldiagnose",
+        fastDescription:"Schnelle Analyse",
+        advancedMode:"Erweiterte Diagnose",
+        advancedDescription:"Mehr Informationen",
+        deviceType:"Gerätetyp",
+        brand:"Hersteller",
+        model:"Modell",
+        year:"Baujahr",
+        symptoms:"Symptome / Problem",
+        select:"Auswählen",
+        car:"Auto",
+        truck:"LKW",
+        machine:"Maschine",
+        electrical:"Elektrisches Gerät",
+        other:"Andere",
+        analyzing:"Bilder werden analysiert...",
+        pleaseWait:"Bitte warten",
+        affectedPart:"Betroffenes Teil",
+        location:"Position",
+        confidence:"Sicherheit",
+        whyDiagnosis:"Warum diese Diagnose?",
+        replacementPart:"Vorgeschlagenes Ersatzteil",
+        partNumber:"Teilenummer",
+        partBrand:"Marke",
+        price:"Preis",
+        repairSteps:"Reparaturschritte",
+        save:"Speichern",
+        print:"Drucken",
+        share:"Teilen",
+        newScan:"Neue Diagnose",
+        recentTitle:"Letzte Diagnosen",
+        noHistory:"Noch keine Diagnosen gespeichert",
+        settings:"Einstellungen",
+        appearance:"Darstellung",
+        appearanceDesc:"Hell- oder Dunkelmodus",
+        dark:"Dunkel",
+        light:"Hell",
+        language:"Sprache",
+        languageDesc:"App-Sprache",
+        diagnosticServer:"Diagnoseserver",
+        diagnosticServerDesc:"Geben Sie die URL des KI-Servers ein, wenn die App einen externen Server verwendet",
+        saveDiagnosticServer:"Server-URL speichern",
+        saveClose:"Speichern und schließen",
+        savedReport:"Gespeicherter Bericht",
+        demoNotice:"Demo-Version. Eine echte KI-Diagnose kann später sicher angebunden werden.",
+        saved:"Bericht gespeichert",
+        deleted:"Bericht gelöscht",
+        historyCleared:"Diagnoseverlauf gelöscht",
+        noReport:"Kein Bericht",
+        cameraError:"Kamera konnte nicht gestartet werden",
+        selectImage:"Bitte Bild auswählen",
+        chooseImageHint:"Wählen Sie ein Bild aus der Galerie, um die Diagnose zu starten",
+        diagnosisReady:"Diagnosebericht erstellt",
+        high:"Hoch",
+        medium:"Mittel",
+        low:"Niedrig",
+        timingIssue:"Anzeichen von Verschleiß oder Rissen am Zahnriemen",
+        timingPart:"Motor-Zahnriemen",
+        engineFront:"Vorderer Motorbereich",
+        reason1:"Am geprüften Bauteil sind Verschleißspuren sichtbar.",
+        reason2:"Die Form passt zu Komponenten des Zahnriemensystems.",
+        reason3:"Die eingegebenen Symptome unterstützen diese Möglichkeit.",
+        step1:"Gerät stoppen und Stromversorgung trennen.",
+        step2:"Umgebende Komponenten prüfen.",
+        step3:"Mit der richtigen Spezifikation vergleichen.",
+        step4:"Teil ersetzen, wenn der Schaden bestätigt ist.",
+        step5:"Nach der Montage einen Abschlusstest durchführen.",
+        partBrandDemo:"Demo-Teiledatenbank",
+        priceUnknown:"Preis abhängig vom Anbieter",
+        view:"Anzeigen",
+        delete:"Löschen",
+        reportOpened:"Bericht geöffnet",
+        shareCopied:"Bericht kopiert",
+        shareFailed:"Teilen nicht möglich"
+    }
+
+};
+
+
+let lang = localStorage.getItem("diag_language") || "en";
+let theme = localStorage.getItem("diag_theme") || "dark";
+
+let stream = null;
+
+let images = [];
+
+let activeIndex = 0;
+
+let currentReport = null;
+let scanGeneration = 0;
+
+let advanced = false;
+
+
+/* ELEMENTS */
+
+const video = document.getElementById("video");
+
+const capturedImage =
+    document.getElementById("capturedImage");
+
+const cameraBox =
+    document.getElementById("cameraBox");
+
+const cameraPlaceholder =
+    document.getElementById("cameraPlaceholder");
+
+const cameraImageGrid =
+    document.getElementById("cameraImageGrid");
+
+const selectedImagesArea =
+    document.getElementById("selectedImagesArea");
+
+const selectedImagesMain =
+    document.getElementById("selectedImagesMain");
+
+const selectedImagesThumbs =
+    document.getElementById("selectedImagesThumbs");
+
+const loading =
+    document.getElementById("loading");
+
+const cameraBtn =
+    document.getElementById("cameraBtn");
+
+const galleryBtn =
+    document.getElementById("galleryBtn");
+
+const galleryInput =
+    document.getElementById("galleryInput");
+
+const cameraInput =
+    document.getElementById("cameraInput");
+
+const captureBtn =
+    document.getElementById("captureBtn");
+
+const analyzeBtn =
+    document.getElementById("analyzeBtn");
+
+const imageList =
+    document.getElementById("imageList");
+
+const reportSection =
+    document.getElementById("reportSection");
+
+const recentList =
+    document.getElementById("recentList");
+
+
+/* UNIVERSAL MODERN SELECT DIALOG */
+function initModernSelects(){
+    document.querySelectorAll("select").forEach(select=>{
+        if(select.dataset.modernReady==="1") return;
+        select.dataset.modernReady="1";
+        select.classList.add("modern-native-hidden");
+        const trigger=document.createElement("button");
+        trigger.type="button";
+        trigger.className="modern-select-trigger";
+        trigger.setAttribute("aria-haspopup","dialog");
+        const label=document.createElement("span");
+        label.className="modern-select-value";
+        const icon=document.createElement("span");
+        icon.className="material-symbols-outlined";
+        icon.textContent="expand_more";
+        trigger.append(label,icon);
+        select.insertAdjacentElement("afterend",trigger);
+        const updateLabel=()=>{const o=select.options[select.selectedIndex];label.textContent=o?o.textContent.trim():t("select");};
+        updateLabel();
+        select.addEventListener("change",updateLabel);
+        trigger.addEventListener("click",()=>openModernChoice(select));
+    });
+}
+function openModernChoice(select){
+    let modal=document.getElementById("modernChoiceModal");
+    if(!modal){
+        modal=document.createElement("div");
+        modal.id="modernChoiceModal";
+        modal.className="modern-choice-modal";
+        modal.innerHTML=`<div class="modern-choice-card" role="dialog" aria-modal="true"><div class="modern-choice-header"><div class="modern-choice-icon"><span class="material-symbols-outlined" id="modernChoiceIcon">tune</span></div><div><div class="modern-choice-title" id="modernChoiceTitle"></div><div class="modern-choice-subtitle" id="modernChoiceSubtitle"></div></div><button type="button" class="modern-choice-close" id="modernChoiceClose">×</button></div><div class="modern-choice-options" id="modernChoiceOptions"></div><div class="modern-choice-footer" id="modernChoiceFooter"></div></div>`;
+        document.body.appendChild(modal);
+        document.getElementById("modernChoiceClose").addEventListener("click",closeModernChoice);
+        modal.addEventListener("click",e=>{if(e.target===modal)closeModernChoice();});
+    }
+    document.getElementById("modernChoiceTitle").textContent=select.closest(".field")?.querySelector("label")?.textContent.trim()||(select.id==="themeSelect"?t("appearance"):select.id==="languageSelect"?t("language"):t("select"));
+    document.getElementById("modernChoiceSubtitle").textContent=select.id==="themeSelect"?t("appearanceDesc"):select.id==="languageSelect"?t("languageDesc"):"اختر الخيار المناسب";
+    document.getElementById("modernChoiceIcon").textContent=select.id==="languageSelect"?"language":select.id==="themeSelect"?"dark_mode":"tune";
+    document.getElementById("modernChoiceFooter").textContent=lang==="ar"?"اختيارك يُطبّق مباشرة": "Your choice is applied instantly";
+    const options=document.getElementById("modernChoiceOptions");
+    options.innerHTML="";
+    Array.from(select.options).forEach(option=>{
+        const b=document.createElement("button"); b.type="button"; b.className="modern-choice-option"+(option.value===select.value?" selected":"");
+        const oi={car:"directions_car",truck:"local_shipping",machine:"precision_manufacturing",electrical:"devices",other:"category",dark:"dark_mode",light:"light_mode",ar:"translate",en:"language",fr:"translate",es:"translate",de:"translate"}[option.value]||"radio_button_checked";
+        b.innerHTML=`<span class="modern-choice-option-icon"><span class="material-symbols-outlined">${oi}</span></span><span class="modern-choice-option-text">${option.textContent.trim()}</span><span class="modern-choice-radio"></span>`;
+        b.addEventListener("click",()=>{select.value=option.value;select.dispatchEvent(new Event("change",{bubbles:true}));closeModernChoice();});
+        options.appendChild(b);
+    });
+    modal.classList.add("active");
+}
+function closeModernChoice(){const modal=document.getElementById("modernChoiceModal");if(modal)modal.classList.remove("active");}
+
+/* TRANSLATION */
+
+function t(key){
+
+    return translations[lang]?.[key]
+        || translations.ar[key]
+        || key;
+
+}
+
+
+function applyTranslations(){
+
+    document
+        .querySelectorAll("[data-i18n]")
+        .forEach(el=>{
+
+            const key = el.dataset.i18n;
+
+            if(translations[lang]?.[key]){
+
+                el.textContent =
+                    translations[lang][key];
+
+            }
+
+        });
+
+
+    document.documentElement.lang = lang;
+
+    document.documentElement.dir =
+        lang === "ar" ? "rtl" : "ltr";
+
+    document.title = t("appName");
+
+    const languageSelect = document.getElementById("languageSelect");
+    if(languageSelect){
+        languageSelect.value = lang;
+    }
+
+}
+
+
+function applyTheme(){
+
+    document.body.classList.toggle(
+        "light",
+        theme === "light"
+    );
+
+    document.getElementById("themeSelect").value =
+        theme;
+
+}
+
+
+/* SCAN CONTROLS - reliable gallery/camera/cancel/analyze state */
+function hasSelectedImages(){
+    return Array.isArray(images) && images.some(src => typeof src === "string" && src.length > 20);
+}
+
+function updateScanControls(){
+    const hasImages = hasSelectedImages();
+    const cameraRunning = !!stream;
+
+    if(analyzeBtn){
+        // Analysis is enabled only when an actual image exists.
+        const canAnalyze = hasImages || cameraRunning;
+        analyzeBtn.disabled = !canAnalyze;
+        analyzeBtn.classList.toggle("scan-action-disabled", !canAnalyze);
+        analyzeBtn.setAttribute("aria-disabled", String(!canAnalyze));
+        analyzeBtn.style.pointerEvents = canAnalyze ? "auto" : "none";
+    }
+
+    if(captureBtn){
+        captureBtn.disabled = !hasImages;
+        captureBtn.classList.toggle("scan-action-disabled", !hasImages);
+        captureBtn.setAttribute("aria-disabled", String(!hasImages));
+        captureBtn.style.pointerEvents = hasImages ? "auto" : "none";
+        captureBtn.closest(".controls").style.display = hasImages ? "grid" : "none";
+    }
+
+    if(selectedImagesArea){
+        selectedImagesArea.classList.toggle("active", hasImages);
+    }
+
+    if(cameraBtn){
+        // Keep the camera button available even after gallery selection so the user can
+        // capture another image. It changes to "Capture photo" while the camera is live.
+        cameraBtn.style.display = "flex";
+        if(cameraRunning){
+            cameraBtn.innerHTML = `
+                <span class="material-symbols-outlined">photo_camera</span>
+                <span>${t("capture")}</span>
+            `;
+        }else if(!hasImages){
+            cameraBtn.innerHTML = `
+                <span class="material-symbols-outlined">photo_camera</span>
+                <span>${t("startCamera")}</span>
+            `;
+        }
+    }
+}
+
+/* CAMERA */
+async function startCamera(){
+    try{
+        if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+            showToast(t("cameraError"));
+            if(cameraInput) cameraInput.click();
+            return;
+        }
+
+        if(stream){
+            stopCamera();
+        }
+
+        stream = await navigator.mediaDevices.getUserMedia({
+            video:{
+                facingMode:{ideal:"environment"},
+                width:{ideal:1920},
+                height:{ideal:1080}
+            },
+            audio:false
+        });
+
+        video.srcObject = stream;
+        video.muted = true;
+        video.playsInline = true;
+        video.style.display = "block";
+        capturedImage.style.display = "none";
+        cameraImageGrid.classList.remove("active");
+        cameraPlaceholder.style.display = "none";
+        cameraBox.classList.add("camera-active");
+
+        try{ await video.play(); }catch(e){ console.warn("Camera playback wait:",e); }
+
+        updateScanControls();
+    }catch(error){
+        stream = null;
+        video.srcObject = null;
+        video.style.display = "none";
+        if(!images.length) cameraPlaceholder.style.display = "flex";
+        updateScanControls();
+        showToast(t("cameraError"));
+        if(cameraInput) cameraInput.click();
+        console.error(error);
+    }
+}
+
+function captureCameraImage(){
+    if(!stream || !video.videoWidth || !video.videoHeight){
+        showToast(t("cameraError"));
+        return false;
+    }
+
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    const ctx = canvas.getContext("2d", {alpha:false});
+    if(!ctx){
+        showToast(t("cameraError"));
+        return false;
+    }
+
+    ctx.drawImage(video,0,0,canvas.width,canvas.height);
+    const data = canvas.toDataURL("image/jpeg",0.92);
+
+    addImage(data);
+    stopCamera();
+    showImageAddedToast(images.length);
+    return true;
+}
+
+function stopCamera(){
+    if(stream){
+        stream.getTracks().forEach(track=>track.stop());
+        stream = null;
+    }
+
+    video.srcObject = null;
+    video.style.display = "none";
+    cameraBox.classList.remove("camera-active");
+
+    if(images.length){
+        showActiveImage();
+        renderCameraImageGrid();
+    }else{
+        capturedImage.style.display = "none";
+        cameraImageGrid.classList.remove("active");
+        cameraPlaceholder.style.display = "flex";
+    }
+
+    updateScanControls();
+}
+
+cameraBtn.addEventListener("click", async event=>{
+    event.preventDefault();
+    event.stopPropagation();
+
+    if(stream){
+        // Second press captures the current camera frame.
+        captureCameraImage();
+    }else{
+        await startCamera();
+    }
+});
+
+/* CANCEL SCAN */
+captureBtn.addEventListener("click", event=>{
+    event.preventDefault();
+    event.stopPropagation();
+
+    if(!hasSelectedImages()) return;
+
+    resetCurrentScan();
+
+    cameraBtn.innerHTML = `
+        <span class="material-symbols-outlined">photo_camera</span>
+        <span>${t("startCamera")}</span>
+    `;
+
+    updateScanControls();
+    showToast(t("scanCancelled"));
+});
+
+/* GALLERY */
+galleryBtn.addEventListener("click", event=>{
+    event.preventDefault();
+    event.stopPropagation();
+    galleryInput.click();
+});
+
+galleryInput.addEventListener("change", async event=>{
+    const files = Array.from(event.target.files || [])
+        .filter(file=>{
+            if(!file) return false;
+            if(file.type && file.type.toLowerCase().startsWith("image/")) return true;
+            return /\.(jpg|jpeg|png|webp|gif|bmp|heic|heif)$/i.test(file.name || "");
+        })
+        .slice(0,5);
+
+    if(!files.length){
+        galleryInput.value = "";
+        updateScanControls();
+        showToast(t("selectImage"));
+        return;
+    }
+
+    try{
+        // Stop the live camera first so it cannot cover the selected image.
+        if(stream) stopCamera();
+
+        // Start this selection as the current scan.
+        images = [];
+        activeIndex = 0;
+
+        // Use object URLs for the gallery preview. This makes the image appear
+        // immediately in the page instead of waiting for a FileReader result.
+        files.slice(0,5).forEach(file=>{
+            const objectUrl = URL.createObjectURL(file);
+            addImage(objectUrl);
+        });
+
+        if(!hasSelectedImages()){
+            throw new Error("No valid image preview was created");
+        }
+
+        // Force the visible preview area and its image to be rendered now.
+        if(selectedImagesArea){
+            selectedImagesArea.classList.add("active");
+            selectedImagesArea.style.display = "block";
+        }
+        renderAllImagePreviews();
+        updateScanControls();
+        showImageAddedToast(images.length);
+        galleryInput.value = "";
+    }catch(error){
+        console.error("Gallery image loading error:",error);
+        galleryInput.value = "";
+        updateScanControls();
+        showToast(t("selectImage"));
+    }
+});
+
+/* MOBILE CAMERA INPUT FALLBACK */
+if(cameraInput){
+    cameraInput.addEventListener("change", async event=>{
+        const file = Array.from(event.target.files || []).find(f=>{
+            if(!f) return false;
+            if(f.type && f.type.toLowerCase().startsWith("image/")) return true;
+            return /\.(jpg|jpeg|png|webp|gif|bmp|heic|heif)$/i.test(f.name || "");
+        });
+
+        if(!file){
+            cameraInput.value = "";
+            updateScanControls();
+            return;
+        }
+
+        try{
+            const data = await new Promise((resolve,reject)=>{
+                const reader = new FileReader();
+                reader.onload = e=>resolve(e.target.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+
+            addImage(data);
+            showImageAddedToast(images.length);
+        }catch(error){
+            console.error("Camera input error:",error);
+            showToast(t("cameraError"));
+        }finally{
+            cameraInput.value = "";
+        }
+    });
+}
+
+/* IMAGE MANAGEMENT */
+function addImage(data){
+    if(typeof data !== "string" || data.length <= 20) return false;
+    if(images.length >= 5) images.shift();
+    images.push(data);
+    activeIndex = images.length - 1;
+    renderAllImagePreviews();
+    updateScanControls();
+    return true;
+}
+
+function renderAllImagePreviews(){
+    showActiveImage();
+    renderImageList();
+    renderCameraImageGrid();
+    renderSelectedImagesArea();
+}
+
+function renderSelectedImagesArea(){
+    if(!selectedImagesArea || !selectedImagesMain || !selectedImagesThumbs) return;
+    if(!hasSelectedImages()){
+        selectedImagesArea.classList.remove("active");
+        selectedImagesMain.innerHTML = `<span class="material-symbols-outlined">image</span><span>${t("chooseImageHint")}</span>`;
+        selectedImagesThumbs.innerHTML = "";
+        return;
+    }
+    selectedImagesArea.classList.add("active");
+    selectedImagesArea.style.display = "block";
+    const safeIndex = Math.max(0,Math.min(activeIndex,images.length-1));
+    activeIndex = safeIndex;
+    selectedImagesMain.innerHTML = "";
+    const main = document.createElement("img");
+    main.src = images[activeIndex];
+    main.alt = `Selected image ${activeIndex+1}`;
+    selectedImagesMain.appendChild(main);
+    selectedImagesThumbs.innerHTML = "";
+    images.forEach((src,index)=>{
+        const thumb=document.createElement("div");
+        thumb.className="selected-image-thumb"+(index===activeIndex?" active":"");
+        const img=document.createElement("img");
+        img.src=src; img.alt=`Image ${index+1}`;
+        const num=document.createElement("span");
+        num.className="selected-image-number"; num.textContent=index+1;
+        thumb.append(img,num);
+        thumb.addEventListener("click",()=>{
+            activeIndex=index;
+            renderAllImagePreviews();
+        });
+        selectedImagesThumbs.appendChild(thumb);
+    });
+}
+
+function renderImageList(){
+    imageList.innerHTML = "";
+    if(!images.length){
+        imageList.classList.remove("active");
+        return;
+    }
+    imageList.classList.add("active");
+
+    images.forEach((src,index)=>{
+        const item = document.createElement("div");
+        item.className = "image-thumb" + (index===activeIndex ? " active" : "");
+        const img = document.createElement("img");
+        img.src = src;
+        img.alt = `Image ${index+1}`;
+        const number = document.createElement("div");
+        number.className = "thumb-number";
+        number.textContent = index+1;
+        item.append(img,number);
+        item.addEventListener("click",()=>{
+            activeIndex=index;
+            showActiveImage();
+            renderImageList();
+            renderCameraImageGrid();
+        });
+        imageList.appendChild(item);
+    });
+}
+
+function renderCameraImageGrid(){
+    cameraImageGrid.innerHTML = "";
+    if(!images.length){
+        cameraImageGrid.classList.remove("active");
+        return;
+    }
+
+    cameraImageGrid.classList.add("active");
+    images.forEach((src,index)=>{
+        const item = document.createElement("div");
+        item.className = "camera-image-preview" + (index===activeIndex ? " active" : "");
+
+        const img = document.createElement("img");
+        img.src = src;
+        img.alt = `Image ${index+1}`;
+
+        const number = document.createElement("div");
+        number.className = "preview-number";
+        number.textContent = index+1;
+
+        item.append(img,number);
+        item.addEventListener("click",()=>{
+            activeIndex=index;
+            showActiveImage();
+            renderImageList();
+            renderCameraImageGrid();
+        });
+        cameraImageGrid.appendChild(item);
+    });
+}
+
+function showActiveImage(){
+    if(!hasSelectedImages()){
+        capturedImage.removeAttribute("src");
+        capturedImage.style.display = "none";
+        cameraImageGrid.classList.remove("active");
+        cameraPlaceholder.style.display = "flex";
+        cameraBox.classList.remove("camera-active");
+        return;
+    }
+
+    const safeIndex = Math.max(0,Math.min(activeIndex,images.length-1));
+    activeIndex = safeIndex;
+
+    capturedImage.onload = ()=>{
+        capturedImage.style.display = "block";
+    };
+    capturedImage.src = images[activeIndex];
+    capturedImage.style.display = "block";
+    capturedImage.style.visibility = "visible";
+    capturedImage.style.opacity = "1";
+    capturedImage.style.zIndex = "2";
+
+    video.style.display = "none";
+    cameraPlaceholder.style.display = "none";
+    cameraBox.classList.add("camera-active");
+}
+
+/* MODE */
+
+
+
+document.getElementById(
+    "fastMode"
+).addEventListener(
+    "click",
+    ()=>{
+
+        advanced = false;
+
+        document.getElementById(
+            "fastMode"
+        ).classList.add("active");
+
+        document.getElementById(
+            "advancedMode"
+        ).classList.remove("active");
+
+        document.getElementById(
+            "advancedPanel"
+        ).classList.remove("active");
+
+    }
+);
+
+
+document.getElementById(
+    "advancedMode"
+).addEventListener(
+    "click",
+    ()=>{
+
+        advanced = true;
+
+        document.getElementById(
+            "advancedMode"
+        ).classList.add("active");
+
+        document.getElementById(
+            "fastMode"
+        ).classList.remove("active");
+
+        document.getElementById(
+            "advancedPanel"
+        ).classList.add("active");
+
+    }
+);
+
+
+/* DEMO DIAGNOSTIC ENGINE */
+
+function buildDemoReport(){
+
+    const symptoms =
+        document.getElementById(
+            "symptoms"
+        ).value.trim();
+
+
+    let confidence = advanced
+        ? 91
+        : 87;
+
+
+    if(symptoms){
+
+        confidence += 2;
+
+    }
+
+
+    return {
+
+        id:
+            Date.now(),
+
+        date:
+            new Date().toISOString(),
+
+        issue:
+            t("timingIssue"),
+
+        part:
+            t("timingPart"),
+
+        location:
+            t("engineFront"),
+
+        severity:
+            "high",
+
+        confidence:
+            Math.min(confidence,96),
+
+        reasons:[
+            t("reason1"),
+            t("reason2"),
+            t("reason3")
+        ],
+
+        partNumber:
+            "TB-9042",
+
+        partBrand:
+            t("partBrandDemo"),
+
+        price:
+            t("priceUnknown"),
+
+        steps:[
+            t("step1"),
+            t("step2"),
+            t("step3"),
+            t("step4"),
+            t("step5")
+        ],
+
+        deviceType:
+            document.getElementById(
+                "deviceType"
+            ).value,
+
+        brand:
+            document.getElementById(
+                "brand"
+            ).value,
+
+        model:
+            document.getElementById(
+                "model"
+            ).value,
+
+        year:
+            document.getElementById(
+                "year"
+            ).value,
+
+        symptoms:
+            symptoms,
+
+        imagesCount:
+            images.length
+
+    };
+
+}
+
+
+/*
+==================================================
+نقطة الربط المستقبلية مع AI الحقيقي
+==================================================
+
+هنا سيتم لاحقًا استبدال buildDemoReport()
+بطلب آمن إلى Backend / API.
+
+مهم جدًا:
+
+لا تضع API Key سري داخل HTML أو JavaScript
+عند ربط النظام بخدمة AI حقيقية.
+
+التدفق النهائي سيكون:
+
+الصور
+   ↓
+HTML
+   ↓
+Backend آمن
+   ↓
+AI Vision
+   ↓
+تحليل الصورة
+   ↓
+قاعدة بيانات الأعطال والقطع
+   ↓
+تقرير التشخيص
+   ↓
+التطبيق
+
+==================================================
+*/
+
+
+/* REAL AI DIAGNOSTIC CONNECTOR */
+const DIAGNOSTIC_API_STORAGE_KEY = "smartDiagnosticApiUrl";
+const DIAGNOSTIC_API_URL = () => (localStorage.getItem(DIAGNOSTIC_API_STORAGE_KEY) || "").trim();
+
+function getDiagnosticRequestPayload(){
+    return {
+        deviceType: document.getElementById("deviceType")?.value || "",
+        brand: document.getElementById("brand")?.value || "",
+        model: document.getElementById("model")?.value || "",
+        year: document.getElementById("year")?.value || "",
+        symptoms: document.getElementById("symptoms")?.value?.trim() || "",
+        mode: advanced ? "advanced" : "fast",
+        images: images.slice(0,5)
+    };
+}
+
+function normalizeDiagnosticReport(report){
+    return {
+        id: report.id || Date.now(),
+        date: report.date || new Date().toISOString(),
+        issue: report.issue || "غير محدد",
+        part: report.part || "غير محدد",
+        location: report.location || "غير محدد",
+        severity: report.severity || "medium",
+        confidence: Number.isFinite(Number(report.confidence)) ? Number(report.confidence) : 0,
+        reasons: Array.isArray(report.reasons) ? report.reasons : [],
+        partNumber: report.partNumber || "غير مؤكد",
+        partBrand: report.partBrand || "غير مؤكد",
+        price: report.price || "غير مؤكد",
+        steps: Array.isArray(report.steps) ? report.steps : [],
+        deviceType: document.getElementById("deviceType")?.value || "",
+        brand: document.getElementById("brand")?.value || "",
+        model: document.getElementById("model")?.value || "",
+        year: document.getElementById("year")?.value || "",
+        symptoms: document.getElementById("symptoms")?.value?.trim() || "",
+        imagesCount: images.length
+    };
+}
+
+async function requestRealDiagnosticAnalysis(){
+    const baseUrl = DIAGNOSTIC_API_URL();
+    if(!baseUrl) throw new Error("API_NOT_CONFIGURED");
+    const controller = new AbortController();
+    const timeout = setTimeout(()=>controller.abort(), 90000);
+    try{
+        const response = await fetch(baseUrl.replace(/\/$/,"") + "/analyze", {
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify(getDiagnosticRequestPayload()),
+            signal:controller.signal
+        });
+        const raw = await response.text();
+        let data = null;
+        try{ data = JSON.parse(raw); }catch(e){}
+        if(!response.ok) throw new Error((data && data.error) || "HTTP_" + response.status);
+        if(!data || !data.report) throw new Error("INVALID_DIAGNOSTIC_RESPONSE");
+        return normalizeDiagnosticReport(data.report);
+    }finally{
+        clearTimeout(timeout);
+    }
+}
+
+function diagnosticApiErrorMessage(error){
+    const code = String(error?.message || error || "");
+    if(code === "API_NOT_CONFIGURED") return lang === "ar" ? "أدخل رابط خادم التشخيص من الإعدادات أولًا." : "Enter the diagnostic server URL in Settings first.";
+    if(code === "Failed to fetch") return lang === "ar" ? "تعذر الاتصال بخادم التشخيص. تحقق من الرابط والإنترنت." : "Could not connect to the diagnostic server. Check the URL and internet connection.";
+    if(code === "AbortError") return lang === "ar" ? "انتهت مهلة التحليل. حاول مرة أخرى." : "Analysis timed out. Please try again.";
+    return lang === "ar" ? "تعذر إكمال التشخيص الحقيقي: " + code : "Real diagnostic failed: " + code;
+}
+
+function initDiagnosticApiSettings(){
+    const input=document.getElementById("diagnosticApiUrlInput");
+    const save=document.getElementById("saveDiagnosticApiUrlBtn");
+    if(input) input.value=localStorage.getItem(DIAGNOSTIC_API_STORAGE_KEY)||"";
+    if(save) save.addEventListener("click",()=>{
+        const value=(input?.value||"").trim().replace(/\/$/,"");
+        if(value) localStorage.setItem(DIAGNOSTIC_API_STORAGE_KEY,value);
+        else localStorage.removeItem(DIAGNOSTIC_API_STORAGE_KEY);
+        showToast(lang === "ar" ? "تم حفظ رابط خادم التشخيص" : "Diagnostic server URL saved");
+    });
+}
+
+/* ANALYZE */
+
+analyzeBtn.addEventListener(
+    "click",
+    analyze
+);
+
+
+async function analyze(event){
+    const myGeneration = scanGeneration;
+    if(event){ event.preventDefault(); event.stopPropagation(); }
+
+    if(stream && !captureCameraImage()){
+        updateScanControls();
+        return;
+    }
+    if(!hasSelectedImages()){
+        showToast(t("selectImage"));
+        updateScanControls();
+        return;
+    }
+
+    loading.classList.add("active");
+    analyzeBtn.disabled = true;
+    analyzeBtn.classList.add("scan-action-disabled");
+    analyzeBtn.setAttribute("aria-disabled","true");
+    analyzeBtn.style.pointerEvents = "none";
+    showActiveImage();
+    renderImageList();
+    renderCameraImageGrid();
+
+    try{
+        if(myGeneration !== scanGeneration || !hasSelectedImages()) return;
+        currentReport = await requestRealDiagnosticAnalysis();
+        if(myGeneration !== scanGeneration || !currentReport) return;
+        renderReport(currentReport);
+        reportSection.classList.add("active");
+        reportSection.scrollIntoView({behavior:"smooth",block:"start"});
+    }catch(error){
+        console.error("Real diagnostic error:", error);
+        showToast(diagnosticApiErrorMessage(error));
+    }finally{
+        loading.classList.remove("active");
+        analyzeBtn.disabled = false;
+        analyzeBtn.classList.remove("scan-action-disabled");
+        analyzeBtn.setAttribute("aria-disabled","false");
+        analyzeBtn.style.pointerEvents = "auto";
+        updateScanControls();
+    }
+}
+
+/* RENDER REPORT */
+
+function renderReport(report){
+
+    if(!report) return;
+
+
+    document.getElementById(
+        "issueName"
+    ).textContent =
+        report.issue;
+
+
+    document.getElementById(
+        "reportDate"
+    ).textContent =
+        formatDate(report.date);
+
+
+    const severity =
+        document.getElementById(
+            "severity"
+        );
+
+
+    severity.textContent =
+        t(report.severity);
+
+
+    severity.className =
+        "severity " +
+        report.severity;
+
+
+    document.getElementById(
+        "affectedPart"
+    ).textContent =
+        report.part;
+
+
+    document.getElementById(
+        "partLocation"
+    ).textContent =
+        report.location;
+
+
+    document.getElementById(
+        "confidenceValue"
+    ).textContent =
+        report.confidence + "%";
+
+
+    setTimeout(
+        ()=>{
+
+            document.getElementById(
+                "confidenceBar"
+            ).style.width =
+                report.confidence + "%";
+
+        },
+        50
+    );
+
+
+    const reasonList =
+        document.getElementById(
+            "reasonList"
+        );
+
+    reasonList.innerHTML = "";
+
+
+    report.reasons.forEach(
+        reason=>{
+
+            const li =
+                document.createElement("li");
+
+            li.textContent =
+                "• " + reason;
+
+            reasonList.appendChild(li);
+
+        }
+    );
+
+
+    document.getElementById(
+        "partNumber"
+    ).textContent =
+        report.partNumber;
+
+
+    document.getElementById(
+        "partBrand"
+    ).textContent =
+        report.partBrand;
+
+
+    document.getElementById(
+        "partPrice"
+    ).textContent =
+        report.price;
+
+
+    const stepsList =
+        document.getElementById(
+            "stepsList"
+        );
+
+    stepsList.innerHTML = "";
+
+
+    report.steps.forEach(
+        (step,index)=>{
+
+            const li =
+                document.createElement("li");
+
+            li.innerHTML =
+                `<strong>${index+1}.</strong> ${step}`;
+
+            stepsList.appendChild(li);
+
+        }
+    );
+
+}
+
+
+/* TRASH / HISTORY */
+
+function getHistory(){
+
+    try{
+        return JSON.parse(
+            localStorage.getItem("diag_history") || "[]"
+        );
+    }catch{
+        return [];
+    }
+
+}
+
+
+function getTrash(){
+
+    try{
+        return JSON.parse(
+            localStorage.getItem("diag_trash") || "[]"
+        );
+    }catch{
+        return [];
+    }
+
+}
+
+
+function saveTrash(items){
+    localStorage.setItem(
+        "diag_trash",
+        JSON.stringify(items)
+    );
+}
+
+
+function moveReportToTrash(id){
+
+    const history = getHistory();
+    const report = history.find(item=>item.id === id);
+
+    if(!report) return;
+
+    const remaining = history.filter(item=>item.id !== id);
+    const trash = getTrash();
+
+    if(!trash.some(item=>item.id === report.id)){
+        trash.unshift(report);
+    }
+
+    localStorage.setItem(
+        "diag_history",
+        JSON.stringify(remaining)
+    );
+
+    saveTrash(trash.slice(0,100));
+
+    renderHistory();
+    renderTrash();
+
+    showToast(t("deleted"));
+}
+
+
+function restoreReport(id){
+
+    const trash = getTrash();
+    const report = trash.find(item=>item.id === id);
+
+    if(!report) return;
+
+    const remainingTrash =
+        trash.filter(item=>item.id !== id);
+
+    const history = getHistory();
+
+    if(!history.some(item=>item.id === report.id)){
+        history.unshift(report);
+    }
+
+    localStorage.setItem(
+        "diag_history",
+        JSON.stringify(history.slice(0,50))
+    );
+
+    saveTrash(remainingTrash);
+
+    renderHistory();
+    renderTrash();
+
+    showToast(t("restored"));
+}
+
+
+function deleteTrashReport(id){
+
+    const trash = getTrash().filter(
+        item=>item.id !== id
+    );
+
+    saveTrash(trash);
+
+    renderTrash();
+
+    showToast(t("permanentlyDeleted"));
+}
+
+
+function renderTrash(){
+
+    const trashList =
+        document.getElementById("trashList");
+
+    const trash = getTrash();
+
+    if(!trash.length){
+
+        trashList.innerHTML = `
+            <div class="recent-empty">
+                <span
+                    class="material-symbols-outlined"
+                    style="font-size:38px;display:block;margin-bottom:8px;"
+                >delete</span>
+                <span>${t("trashEmpty")}</span>
+            </div>
+        `;
+
+        return;
+    }
+
+    trashList.innerHTML = `
+        <div class="trash-list"></div>
+    `;
+
+    const list =
+        trashList.querySelector(".trash-list");
+
+    trash.forEach(report=>{
+
+        const item =
+            document.createElement("div");
+
+        item.className = "trash-item";
+
+        item.innerHTML = `
+            <div class="trash-info">
+                <div class="trash-issue">
+                    ${escapeHTML(report.issue)}
+                </div>
+                <div class="trash-meta">
+                    ${formatDate(report.date)}
+                    •
+                    ${report.confidence}%
+                </div>
+            </div>
+
+            <div class="trash-buttons">
+                <button
+                    class="small-btn restore-report"
+                    title="${t("restore")}"
+                >
+                    <span class="material-symbols-outlined">
+                        restore_from_trash
+                    </span>
+                </button>
+
+                <button
+                    class="small-btn delete permanent-delete"
+                    title="${t("deleteForever")}"
+                >
+                    <span class="material-symbols-outlined">
+                        delete_forever
+                    </span>
+                </button>
+            </div>
+        `;
+
+        item.querySelector(".restore-report")
+            .addEventListener(
+                "click",
+                ()=>restoreReport(report.id)
+            );
+
+        item.querySelector(".permanent-delete")
+            .addEventListener(
+                "click",
+                ()=>{
+
+                    if(!confirm(
+                        lang==="ar"
+                        ? "هل تريد حذف التقرير نهائيًا؟"
+                        : t("deleteForever") + "?"
+                    )) return;
+
+                    deleteTrashReport(report.id);
+                }
+            );
+
+        list.appendChild(item);
+
+    });
+
+}
+
+
+function deleteHistoryReport(id){
+    moveReportToTrash(id);
+}
+
+
+/* CLEAR HISTORY = MOVE ALL TO TRASH */
+
+document.getElementById(
+    "clearHistoryBtn"
+).addEventListener(
+    "click",
+    ()=>{
+
+        const history = getHistory();
+
+        if(!history.length) return;
+
+        const confirmed =
+            confirm(
+                lang==="ar"
+                ? "هل تريد نقل جميع عمليات التشخيص إلى سلة المحذوفات؟"
+                : t("trashCleared") + "?"
+            );
+
+        if(!confirmed) return;
+
+        const trash = getTrash();
+
+        history.forEach(report=>{
+            if(!trash.some(item=>item.id === report.id)){
+                trash.push(report);
+            }
+        });
+
+        localStorage.setItem("diag_history","[]");
+        saveTrash(trash.slice(0,100));
+
+        renderHistory();
+        renderTrash();
+
+        showToast(t("trashCleared"));
+    }
+);
+
+
+/* TRASH MODAL */
+
+document.getElementById(
+    "closeTrash"
+).addEventListener(
+    "click",
+    ()=>{
+        document.getElementById(
+            "trashModal"
+        ).classList.remove("active");
+    }
+);
+
+document.getElementById(
+    "trashModal"
+).addEventListener(
+    "click",
+    e=>{
+        if(e.target.id === "trashModal"){
+            e.currentTarget.classList.remove("active");
+        }
+    }
+);
+
+
+/* SAVE REPORT */
+
+document.getElementById(
+    "saveReportBtn"
+).addEventListener(
+    "click",
+    ()=>{
+
+        if(!currentReport){
+
+            showToast(t("noReport"));
+
+            return;
+
+        }
+
+        const history = getHistory();
+
+        const alreadyExists =
+            history.some(
+                item => item.id === currentReport.id
+            );
+
+        if(!alreadyExists){
+            history.unshift(currentReport);
+        }
+
+        // If a restored/saved report exists in Trash, remove its trash copy.
+        const trash =
+            getTrash().filter(
+                item=>item.id !== currentReport.id
+            );
+
+        localStorage.setItem(
+            "diag_history",
+            JSON.stringify(history.slice(0,50))
+        );
+
+        saveTrash(trash);
+
+        renderHistory();
+        renderTrash();
+
+        showToast(t("saved"));
+    }
+);
+
+
+/* HISTORY */
+
+/* PRINT */
+
+document.getElementById(
+    "printReportBtn"
+).addEventListener(
+    "click",
+    ()=>{
+
+        if(!currentReport) return;
+
+
+        const r =
+            currentReport;
+
+
+        const printWindow =
+            window.open(
+                "",
+                "_blank"
+            );
+
+
+        printWindow.document.write(`
+
+            <!DOCTYPE html>
+
+            <html lang="${lang}" dir="${lang==="ar"?"rtl":"ltr"}">
+
+            <head>
+
+                <meta charset="UTF-8">
+
+                <title>${escapeHTML(r.issue)}</title>
+
+                <style>
+
+                    body{
+                        font-family:Arial,sans-serif;
+                        padding:35px;
+                        color:#111827;
+                    }
+
+                    h1{
+                        margin-bottom:5px;
+                    }
+
+                    .date{
+                        color:#64748b;
+                        margin-bottom:25px;
+                    }
+
+                    .box{
+                        border:1px solid #ddd;
+                        border-radius:12px;
+                        padding:14px;
+                        margin:10px 0;
+                    }
+
+                    h2{
+                        margin-top:25px;
+                    }
+
+                    li{
+                        margin:8px 0;
+                    }
+
+                </style>
+
+            </head>
+
+            <body>
+
+                <h1>
+                    ${escapeHTML(r.issue)}
+                </h1>
+
+                <div class="date">
+                    ${formatDate(r.date)}
+                </div>
+
+
+                <div class="box">
+                    <strong>${t("affectedPart")}</strong><br>
+                    ${escapeHTML(r.part)}
+                </div>
+
+
+                <div class="box">
+                    <strong>${t("location")}</strong><br>
+                    ${escapeHTML(r.location)}
+                </div>
+
+
+                <div class="box">
+                    <strong>${t("confidence")}</strong><br>
+                    ${r.confidence}%
+                </div>
+
+
+                <h2>
+                    ${t("whyDiagnosis")}
+                </h2>
+
+                <ul>
+
+                    ${
+                        r.reasons
+                        .map(
+                            x =>
+                            `<li>${escapeHTML(x)}</li>`
+                        )
+                        .join("")
+                    }
+
+                </ul>
+
+
+                <h2>
+                    ${t("replacementPart")}
+                </h2>
+
+                <div class="box">
+
+                    ${t("partNumber")}:
+                    ${escapeHTML(r.partNumber)}
+
+                    <br>
+
+                    ${t("partBrand")}:
+                    ${escapeHTML(r.partBrand)}
+
+                    <br>
+
+                    ${t("price")}:
+                    ${escapeHTML(r.price)}
+
+                </div>
+
+
+                <h2>
+                    ${t("repairSteps")}
+                </h2>
+
+                <ol>
+
+                    ${
+                        r.steps
+                        .map(
+                            x =>
+                            `<li>${escapeHTML(x)}</li>`
+                        )
+                        .join("")
+                    }
+
+                </ol>
+
+
+                <script>
+
+                    window.onload = function(){
+                        window.print();
+                    };
+
+                <\/script>
+
+            </body>
+
+            </html>
+
+        `);
+
+        printWindow.document.close();
+
+    }
+);
+
+
+/* SHARE */
+
+document.getElementById(
+    "shareReportBtn"
+).addEventListener(
+    "click",
+    async()=>{
+
+        if(!currentReport) return;
+
+
+        const r =
+            currentReport;
+
+
+        const text =
+
+`${r.issue}
+
+${t("affectedPart")}: ${r.part}
+
+${t("location")}: ${r.location}
+
+${t("confidence")}: ${r.confidence}%
+
+${t("replacementPart")}: ${r.partNumber}
+
+${t("repairSteps")}:
+${r.steps.map((x,i)=>`${i+1}. ${x}`).join("\n")}`;
+
+
+        try{
+
+            if(
+                navigator.share
+            ){
+
+                await navigator.share({
+
+                    title:r.issue,
+
+                    text:text
+
+                });
+
+            }else{
+
+                await navigator.clipboard.writeText(
+                    text
+                );
+
+                showToast(
+                    t("shareCopied")
+                );
+
+            }
+
+        }catch(error){
+
+            console.error(error);
+
+        }
+
+    }
+);
+
+
+/* NEW SCAN */
+
+document.getElementById(
+    "newScanBtn"
+).addEventListener(
+    "click",
+    ()=>{
+        resetCurrentScan();
+
+        window.scrollTo({
+            top:0,
+            behavior:"smooth"
+        });
+    }
+);
+
+
+/* TRASH */
+
+document.getElementById(
+    "trashBtn"
+).addEventListener(
+    "click",
+    ()=>{
+        renderTrash();
+        document.getElementById("trashModal").classList.add("active");
+    }
+);
+
+
+function resetCurrentScan(){
+
+    // Invalidate any analysis that is currently waiting/processing.
+    scanGeneration++;
+    loading.classList.remove("active");
+
+    // Clear the scan state FIRST so stopCamera cannot re-render an old image.
+    if(stream){
+        stream.getTracks().forEach(track=>track.stop());
+        stream = null;
+    }
+
+    images = [];
+
+    activeIndex = 0;
+
+    currentReport = null;
+
+    capturedImage.src = "";
+
+    capturedImage.style.display =
+        "none";
+
+    video.style.display =
+        "none";
+
+    cameraPlaceholder.style.display =
+        "flex";
+
+    cameraBox.classList.remove(
+        "camera-active"
+    );
+
+    imageList.innerHTML = "";
+
+    imageList.classList.remove(
+        "active"
+    );
+
+    cameraImageGrid.innerHTML = "";
+    cameraImageGrid.classList.remove("active");
+    renderSelectedImagesArea();
+
+    updateScanControls();
+
+    reportSection.classList.remove(
+        "active"
+    );
+
+    document.getElementById(
+        "confidenceBar"
+    ).style.width = "0%";
+
+    galleryInput.value = "";
+
+}
+
+
+/* SETTINGS */
+
+document.getElementById(
+    "settingsBtn"
+).addEventListener(
+    "click",
+    ()=>{
+        document.getElementById(
+            "settingsModal"
+        ).classList.add("active");
+    }
+);
+
+
+document.getElementById(
+    "closeSettings"
+).addEventListener(
+    "click",
+    closeSettings
+);
+
+
+function saveSettingsLive(){
+
+    theme = document.getElementById("themeSelect").value;
+    lang = document.getElementById("languageSelect").value;
+
+    localStorage.setItem("diag_theme", theme);
+    localStorage.setItem("diag_language", lang);
+
+    applyTheme();
+    applyTranslations();
+    renderHistory();
+}
+
+document.getElementById("themeSelect").addEventListener("change", saveSettingsLive);
+document.getElementById("languageSelect").addEventListener("change", saveSettingsLive);
+
+const saveSettingsBtn = document.getElementById("saveSettingsBtn");
+if(saveSettingsBtn){
+    saveSettingsBtn.addEventListener("click", saveSettingsLive);
+}
+
+
+
+function closeSettings(){
+
+    document.getElementById(
+        "settingsModal"
+    ).classList.remove(
+        "active"
+    );
+
+}
+
+
+/* HISTORY MODAL */
+
+document.getElementById(
+    "closeHistory"
+).addEventListener(
+    "click",
+    ()=>{
+        document.getElementById(
+            "historyModal"
+        ).classList.remove(
+            "active"
+        );
+    }
+);
+
+
+document.getElementById(
+    "historyModal"
+).addEventListener(
+    "click",
+    e=>{
+
+        if(
+            e.target.id ===
+            "historyModal"
+        ){
+
+            e.currentTarget.classList.remove(
+                "active"
+            );
+
+        }
+
+    }
+);
+
+
+document.getElementById(
+    "settingsModal"
+).addEventListener(
+    "click",
+    e=>{
+
+        if(
+            e.target.id ===
+            "settingsModal"
+        ){
+
+            e.currentTarget.classList.remove(
+                "active"
+            );
+
+        }
+
+    }
+);
+
+
+/* TOAST */
+
+let toastTimer;
+
+function showImageAddedToast(count){
+    const toast = document.getElementById("toast");
+    if(!toast) return;
+
+    clearTimeout(toastTimer);
+
+    const label = lang === "ar"
+        ? `تم إضافة ${count > 1 ? "الصور" : "الصورة"} بنجاح`
+        : `${count > 1 ? "Images" : "Image"} added successfully`;
+
+    toast.className = "toast success-toast show";
+    toast.innerHTML = `
+        <span class="toast-icon">
+            <span class="material-symbols-outlined">check_circle</span>
+        </span>
+        <span>${label}</span>
+    `;
+
+    toastTimer = setTimeout(()=>{
+        toast.className = "toast";
+        toast.innerHTML = "";
+    },1800);
+}
+
+
+function showToast(message){
+
+    const toast =
+        document.getElementById(
+            "toast"
+        );
+
+
+    clearTimeout(toastTimer);
+
+    toast.className = "toast show";
+    toast.textContent = message;
+
+    toastTimer = setTimeout(()=>{
+        toast.className = "toast";
+    },1800);
+
+}
+
+
+/* DATE */
+
+function formatDate(value){
+
+    const date =
+        new Date(value);
+
+
+    if(
+        Number.isNaN(
+            date.getTime()
+        )
+    ){
+
+        return value;
+
+    }
+
+
+    return new Intl.DateTimeFormat(
+        lang==="ar"
+            ? "en-GB"
+            : lang,
+        {
+            year:"numeric",
+            month:"2-digit",
+            day:"2-digit",
+            hour:"2-digit",
+            minute:"2-digit"
+        }
+    ).format(date);
+
+}
+
+
+/* SECURITY */
+
+function escapeHTML(value){
+
+    return String(
+        value ?? ""
+    )
+    .replace(
+        /&/g,
+        "&amp;"
+    )
+    .replace(
+        /</g,
+        "&lt;"
+    )
+    .replace(
+        />/g,
+        "&gt;"
+    )
+    .replace(
+        /"/g,
+        "&quot;"
+    )
+    .replace(
+        /'/g,
+        "&#039;"
+    );
+
+}
+
+
+/* INIT */
+
+applyTranslations();
+
+applyTheme();
+
+initModernSelects();
+renderAllImagePreviews();
+updateScanControls();
+
+renderHistory();
+initDiagnosticApiSettings();
+
+</script>
+
+</body>
+</html>
